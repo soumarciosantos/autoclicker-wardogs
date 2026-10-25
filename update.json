@@ -1,8 +1,16 @@
 {
-  "versao": "3.2.1",
-  "exe": "https://github.com/soumarciosantos/autoclicker-wardogs/releases/download/v3.2.1/AutoclickerWardogs.exe",
-  "sha256": "bb4d2ed5b655c84d81a0656cb4e88cec4da96ad6c540b2cf99915c8d8a519027",
+  "versao": "3.3.0",
+  "exe": "https://github.com/soumarciosantos/autoclicker-wardogs/releases/download/v3.3.0/AutoclickerWardogs.exe",
+  "sha256": "ea2c05c650076276ed46256d5221190ff3ba7e7a94fd48dca6a015dd69add4d8",
   "novidades": [
+    {
+      "versao": "3.3.0",
+      "data": "2026-10-25",
+      "itens": [
+        "A cada 1 s o mouse sai do card (desce 150 px), espera um instante e volta, sem clicar enquanto está fora",
+        "Novos ajustes: \"Sair do card e voltar a cada (ms)\" e \"Distância que o mouse desce (px)\""
+      ]
+    },
     {
       "versao": "3.2.1",
       "data": "2026-10-25",
