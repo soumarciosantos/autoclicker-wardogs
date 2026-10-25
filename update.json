@@ -1,8 +1,18 @@
 {
-  "versao": "3.3.0",
-  "exe": "https://github.com/soumarciosantos/autoclicker-wardogs/releases/download/v3.3.0/AutoclickerWardogs.exe",
-  "sha256": "ea2c05c650076276ed46256d5221190ff3ba7e7a94fd48dca6a015dd69add4d8",
+  "versao": "3.3.1",
+  "exe": "https://github.com/soumarciosantos/autoclicker-wardogs/releases/download/v3.3.1/AutoclickerWardogs.exe",
+  "sha256": "238fe030c83ebf819283f789a7e0903863e1587b15d81959740b55372919a21d",
   "novidades": [
+    {
+      "versao": "3.3.1",
+      "data": "2026-10-25",
+      "itens": [
+        "Corrige o cursor do jogo que ia subindo até o topo da tela",
+        "Antes de sair do card o programa faz uma pausa, para o jogo não perder o movimento",
+        "O mouse sai em passos pequenos e alterna entre descer e subir",
+        "Intervalo padrão passa a 15 ms, com aviso quando estiver rápido demais para o jogo"
+      ]
+    },
     {
       "versao": "3.3.0",
       "data": "2026-10-25",
