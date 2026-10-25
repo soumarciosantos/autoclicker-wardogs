@@ -1,0 +1,50 @@
+{
+  "versao": "3.0.0",
+  "exe": "https://github.com/soumarciosantos/autoclicker-wardogs/releases/download/v3.0.0/AutoclickerWardogs.exe",
+  "sha256": "787278a61826d2cd8ce1d7b00c15a99ac3f1df01d143a87bf6c23a9da5eaa729",
+  "novidades": [
+    {
+      "versao": "3.0.0",
+      "data": "2026-10-25",
+      "itens": [
+        "Programa refeito em C#: um único .exe que abre sem instalar nada",
+        "A atualização troca o .exe sozinha e reabre o programa",
+        "Janela se ajusta à escala de tela do Windows (125%, 150%...)",
+        "Ajustes salvos em %APPDATA%\\AutoclickerWardogs",
+        "Impede abrir duas cópias ao mesmo tempo"
+      ]
+    },
+    {
+      "versao": "2.0.0",
+      "data": "2026-10-25",
+      "itens": [
+        "Interface em janela com painel, gráfico de cliques/s e log",
+        "Aba de ajustes",
+        "Atualização automática pela internet com conferência sha256",
+        "Cliques em thread própria: mais rápidos e estáveis"
+      ]
+    },
+    {
+      "versao": "1.2.0",
+      "data": "2026-10-25",
+      "itens": [
+        "Status ao vivo no terminal"
+      ]
+    },
+    {
+      "versao": "1.1.0",
+      "data": "2026-10-24",
+      "itens": [
+        "Rajadas de cliques sem pausa",
+        "Para sozinho ao entrar na facção"
+      ]
+    },
+    {
+      "versao": "1.0.0",
+      "data": "2026-10-24",
+      "itens": [
+        "Primeira versão: F8 liga/pausa, F9 sai"
+      ]
+    }
+  ]
+}
