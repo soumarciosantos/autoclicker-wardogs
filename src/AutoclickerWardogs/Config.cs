@@ -29,7 +29,7 @@ namespace AutoclickerWardogs
 
         void Padroes()
         {
-            IntervaloMs = 5; Tremor = 1; SaidaMs = 1000; SaidaPx = 150; AutoParar = true; Limiar = 60; Checagens = 6;
+            IntervaloMs = 15; Tremor = 1; SaidaMs = 1000; SaidaPx = 150; AutoParar = true; Limiar = 60; Checagens = 6;
             SempreNoTopo = true; Bipe = true; VerificarAoAbrir = true;
         }
 

@@ -1,5 +1,15 @@
 [
   {
+    "versao": "3.3.1",
+    "data": "2026-10-25",
+    "itens": [
+      "Corrige o cursor do jogo que ia subindo até o topo da tela",
+      "Antes de sair do card o programa faz uma pausa, para o jogo não perder o movimento",
+      "O mouse sai em passos pequenos e alterna entre descer e subir",
+      "Intervalo padrão passa a 15 ms, com aviso quando estiver rápido demais para o jogo"
+    ]
+  },
+  {
     "versao": "3.3.0",
     "data": "2026-10-25",
     "itens": [

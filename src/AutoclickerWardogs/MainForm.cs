@@ -190,6 +190,8 @@ namespace AutoclickerWardogs
             btnIniciar.BackColor = Tema.Amarelo;
             Status("CLICANDO", Tema.Verde, "F8 pausa  |  F9 para");
             Log($"Clicando em ({alvo.X}, {alvo.Y})");
+            if (cfg.IntervaloMs < 10)
+                Log($"Aviso: intervalo de {cfg.IntervaloMs} ms é rápido demais para o jogo; use 15 ms em Ajustes");
         }
 
         void AplicarAjustesDoClique()
@@ -280,17 +282,17 @@ namespace AutoclickerWardogs
         {
             pa.Controls.Add(Tema.Rotulo("Intervalo entre cliques (ms)", 0, 4, 300, 22, 10));
             numIntervalo = Tema.Numero(pa, 340, 2, 0, 1000, cfg.IntervaloMs);
-            pa.Controls.Add(Tema.Rotulo("1 ms ≈ 1000/s, 5 ms ≈ 200/s, 20 ms ≈ 50/s. Se o jogo não registrar, aumente.", 0, 30, 456, 34, 8, Tema.Sub));
+            pa.Controls.Add(Tema.Rotulo("Recomendado: 15 ms (≈ 60/s). O jogo só lê um clique por quadro; abaixo de 10 ms ele começa a perder cliques e movimentos.", 0, 30, 456, 34, 8, Tema.Sub));
             pa.Controls.Add(Tema.Rotulo("Mexer o mouse entre cliques (px)", 0, 72, 300, 22, 10));
             numTremor = Tema.Numero(pa, 340, 70, 0, 10, cfg.Tremor);
             pa.Controls.Add(Tema.Rotulo("Anda esse tanto para a esquerda e para a direita a cada clique, para o jogo perceber o mouse no card. 0 = parado.", 0, 98, 456, 34, 8, Tema.Sub));
             pa.Controls.Add(Tema.Rotulo("Sair do card e voltar a cada (ms)", 0, 140, 300, 22, 10));
             numSaidaMs = Tema.Numero(pa, 340, 138, 0, 10000, cfg.SaidaMs);
             numSaidaMs.Increment = 100;
-            pa.Controls.Add(Tema.Rotulo("Distância que o mouse desce (px)", 0, 176, 300, 22, 10));
+            pa.Controls.Add(Tema.Rotulo("Distância que o mouse anda (px)", 0, 176, 300, 22, 10));
             numSaidaPx = Tema.Numero(pa, 340, 174, 20, 600, cfg.SaidaPx);
             numSaidaPx.Increment = 10;
-            pa.Controls.Add(Tema.Rotulo("Sem clicar: desce para fora do card, espera um instante e volta, como se você tirasse o mouse e pusesse de novo. 0 ms = desligado.", 0, 202, 456, 34, 8, Tema.Sub));
+            pa.Controls.Add(Tema.Rotulo("Sem clicar: sai do card (uma vez descendo, na outra subindo), espera um instante e volta, como se você tirasse o mouse e pusesse de novo. 0 ms = desligado.", 0, 202, 456, 34, 8, Tema.Sub));
             chkAuto = Tema.Caixa(pa, "Parar sozinho quando entrar no time", 0, 244, cfg.AutoParar);
             pa.Controls.Add(Tema.Rotulo("Quanto da tela precisa mudar (%)", 0, 280, 300, 22, 10));
             numLimiar = Tema.Numero(pa, 340, 278, 20, 95, cfg.Limiar);

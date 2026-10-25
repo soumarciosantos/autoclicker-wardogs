@@ -9,10 +9,11 @@ namespace AutoclickerWardogs
         public volatile int DelayMs = 5;
         // pixels que o mouse anda para cada lado entre os cliques (0 = parado)
         public volatile int Tremor = 1;
-        // de quanto em quanto tempo o mouse sai do card e volta (0 = nunca) e quanto ele desce
+        // de quanto em quanto tempo o mouse sai do card e volta (0 = nunca) e quanto ele anda
         public volatile int SaidaMs = 1000;
         public volatile int SaidaPx = 150;
         const int EsperaForaMs = 60;
+        bool descer;
         int x, y;
         long total;
         volatile bool rodando;
@@ -73,16 +74,35 @@ namespace AutoclickerWardogs
             }
         }
 
-        // Tira o mouse do card (para baixo, longe dos outros times), espera e volta, sem clicar.
-        // As esperas dão tempo de o jogo desenhar alguns quadros e perceber que o mouse saiu e entrou.
+        // Tira o mouse do card (na vertical, longe dos outros times), espera e volta, sem clicar.
+        // - Antes de sair fica em silêncio: com cliques muito rápidos a fila de entrada do jogo enche
+        //   e o Windows descarta eventos; sem a pausa, a ida se perdia e só a volta chegava.
+        // - Alterna descer e subir, para que qualquer erro não se acumule sempre na mesma direção.
+        // - As esperas dão tempo de o jogo desenhar alguns quadros e perceber que o mouse saiu e entrou.
         void SairEVoltar()
         {
             int d = SaidaPx;
             if (d <= 0) return;
-            Native.mouse_event(Native.MOUSEEVENTF_MOVE, 0, d, 0, UIntPtr.Zero);
+            descer = !descer;
+            int sentido = descer ? 1 : -1;
             Thread.Sleep(EsperaForaMs);
-            Native.mouse_event(Native.MOUSEEVENTF_MOVE, 0, -d, 0, UIntPtr.Zero);
+            MoverEmPassos(sentido * d);
             Thread.Sleep(EsperaForaMs);
+            MoverEmPassos(-sentido * d);
+            Thread.Sleep(EsperaForaMs);
+        }
+
+        // anda na vertical em passos de até 10 px, como uma mão, em vez de um salto só
+        static void MoverEmPassos(int dy)
+        {
+            int passos = Math.Max(1, (Math.Abs(dy) + 9) / 10), feito = 0;
+            for (int i = 1; i <= passos; i++)
+            {
+                int ate = dy * i / passos;
+                Native.mouse_event(Native.MOUSEEVENTF_MOVE, 0, ate - feito, 0, UIntPtr.Zero);
+                feito = ate;
+                Thread.Sleep(1);
+            }
         }
     }
 }
