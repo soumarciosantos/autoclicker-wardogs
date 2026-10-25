@@ -1,8 +1,17 @@
 {
-  "versao": "3.0.0",
-  "exe": "https://github.com/soumarciosantos/autoclicker-wardogs/releases/download/v3.0.0/AutoclickerWardogs.exe",
-  "sha256": "787278a61826d2cd8ce1d7b00c15a99ac3f1df01d143a87bf6c23a9da5eaa729",
+  "versao": "3.1.0",
+  "exe": "https://github.com/soumarciosantos/autoclicker-wardogs/releases/download/v3.1.0/AutoclickerWardogs.exe",
+  "sha256": "3efabd113ed5e16468eaad15209ec2377dfd1db9683d614468eab724493cfba5",
   "novidades": [
+    {
+      "versao": "3.1.0",
+      "data": "2026-10-25",
+      "itens": [
+        "Instalador: atalho no Menu Iniciar e na área de trabalho",
+        "Aparece em Aplicativos instalados do Windows para desinstalar",
+        "Instala na pasta do usuário, sem pedir administrador"
+      ]
+    },
     {
       "versao": "3.0.0",
       "data": "2026-10-25",
