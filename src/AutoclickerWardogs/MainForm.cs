@@ -35,7 +35,7 @@ namespace AutoclickerWardogs
         Button btnIniciar, btnParar, btnVerificar, btnInstalar;
         ListBox log;
         RichTextBox rtb;
-        NumericUpDown numIntervalo, numTremor, numLimiar, numChecagens;
+        NumericUpDown numIntervalo, numTremor, numSaidaMs, numSaidaPx, numLimiar, numChecagens;
         CheckBox chkAuto, chkTopo, chkBipe, chkVerificar;
 
         public MainForm(bool atualizado)
@@ -181,15 +181,23 @@ namespace AutoclickerWardogs
             alvo = new Point(p.X, p.Y);
             try { referencia = ScreenWatcher.Amostra(alvo); } catch { referencia = null; }
             trocada = 0; frac = 0;
-            clicker.DelayMs = cfg.IntervaloMs;
-            clicker.Tremor = cfg.Tremor;
+            AplicarAjustesDoClique();
             clicker.Iniciar(alvo.X, alvo.Y);
             sessao.Start();
-            lblAlvo.Text = $"Alvo: ({alvo.X}, {alvo.Y})  |  intervalo {cfg.IntervaloMs} ms  |  mexe ±{cfg.Tremor} px";
+            lblAlvo.Text = $"Alvo: ({alvo.X}, {alvo.Y})  |  {cfg.IntervaloMs} ms  |  ±{cfg.Tremor} px" +
+                (cfg.SaidaMs > 0 ? $"  |  sai a cada {cfg.SaidaMs / 1000.0:0.#} s" : "");
             btnIniciar.Text = "Pausar (F8)";
             btnIniciar.BackColor = Tema.Amarelo;
             Status("CLICANDO", Tema.Verde, "F8 pausa  |  F9 para");
             Log($"Clicando em ({alvo.X}, {alvo.Y})");
+        }
+
+        void AplicarAjustesDoClique()
+        {
+            clicker.DelayMs = cfg.IntervaloMs;
+            clicker.Tremor = cfg.Tremor;
+            clicker.SaidaMs = cfg.SaidaMs;
+            clicker.SaidaPx = cfg.SaidaPx;
         }
 
         void Pausar()
@@ -276,28 +284,37 @@ namespace AutoclickerWardogs
             pa.Controls.Add(Tema.Rotulo("Mexer o mouse entre cliques (px)", 0, 72, 300, 22, 10));
             numTremor = Tema.Numero(pa, 340, 70, 0, 10, cfg.Tremor);
             pa.Controls.Add(Tema.Rotulo("Anda esse tanto para a esquerda e para a direita a cada clique, para o jogo perceber o mouse no card. 0 = parado.", 0, 98, 456, 34, 8, Tema.Sub));
-            chkAuto = Tema.Caixa(pa, "Parar sozinho quando entrar no time", 0, 140, cfg.AutoParar);
-            pa.Controls.Add(Tema.Rotulo("Quanto da tela precisa mudar (%)", 0, 176, 300, 22, 10));
-            numLimiar = Tema.Numero(pa, 340, 174, 20, 95, cfg.Limiar);
-            pa.Controls.Add(Tema.Rotulo("Conferências seguidas antes de parar (1 por s)", 0, 212, 330, 22, 10));
-            numChecagens = Tema.Numero(pa, 340, 210, 1, 30, cfg.Checagens);
-            chkTopo = Tema.Caixa(pa, "Janela sempre por cima do jogo", 0, 254, cfg.SempreNoTopo);
-            chkBipe = Tema.Caixa(pa, "Bipe ao entrar no time", 0, 284, cfg.Bipe);
-            var btnSalvar = Tema.Botao("Salvar ajustes", 0, 330, 456, 40, Tema.Azul);
-            lblSalvo = Tema.Rotulo("", 0, 376, 456, 20, 9, Tema.Verde);
+            pa.Controls.Add(Tema.Rotulo("Sair do card e voltar a cada (ms)", 0, 140, 300, 22, 10));
+            numSaidaMs = Tema.Numero(pa, 340, 138, 0, 10000, cfg.SaidaMs);
+            numSaidaMs.Increment = 100;
+            pa.Controls.Add(Tema.Rotulo("Distância que o mouse desce (px)", 0, 176, 300, 22, 10));
+            numSaidaPx = Tema.Numero(pa, 340, 174, 20, 600, cfg.SaidaPx);
+            numSaidaPx.Increment = 10;
+            pa.Controls.Add(Tema.Rotulo("Sem clicar: desce para fora do card, espera um instante e volta, como se você tirasse o mouse e pusesse de novo. 0 ms = desligado.", 0, 202, 456, 34, 8, Tema.Sub));
+            chkAuto = Tema.Caixa(pa, "Parar sozinho quando entrar no time", 0, 244, cfg.AutoParar);
+            pa.Controls.Add(Tema.Rotulo("Quanto da tela precisa mudar (%)", 0, 280, 300, 22, 10));
+            numLimiar = Tema.Numero(pa, 340, 278, 20, 95, cfg.Limiar);
+            pa.Controls.Add(Tema.Rotulo("Conferências seguidas antes de parar (1 por s)", 0, 316, 330, 22, 10));
+            numChecagens = Tema.Numero(pa, 340, 314, 1, 30, cfg.Checagens);
+            chkTopo = Tema.Caixa(pa, "Janela sempre por cima do jogo", 0, 358, cfg.SempreNoTopo);
+            chkBipe = Tema.Caixa(pa, "Bipe ao entrar no time", 0, 388, cfg.Bipe);
+            var btnSalvar = Tema.Botao("Salvar ajustes", 0, 432, 456, 40, Tema.Azul);
+            lblSalvo = Tema.Rotulo("", 0, 478, 456, 20, 9, Tema.Verde);
             pa.Controls.AddRange(new Control[] { btnSalvar, lblSalvo });
 
             btnSalvar.Click += (s, e) =>
             {
                 cfg.IntervaloMs = (int)numIntervalo.Value;
                 cfg.Tremor = (int)numTremor.Value;
+                cfg.SaidaMs = (int)numSaidaMs.Value;
+                cfg.SaidaPx = (int)numSaidaPx.Value;
                 cfg.AutoParar = chkAuto.Checked;
                 cfg.Limiar = (int)numLimiar.Value;
                 cfg.Checagens = (int)numChecagens.Value;
                 cfg.SempreNoTopo = chkTopo.Checked;
                 cfg.Bipe = chkBipe.Checked;
                 clicker.DelayMs = cfg.IntervaloMs;
-                clicker.Tremor = cfg.Tremor;
+                AplicarAjustesDoClique();
                 TopMost = cfg.SempreNoTopo;
                 SalvarConfig();
             };

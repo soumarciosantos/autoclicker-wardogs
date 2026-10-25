@@ -10,6 +10,8 @@ namespace AutoclickerWardogs
     {
         [DataMember(Name = "intervaloMs")] public int IntervaloMs;
         [DataMember(Name = "tremor")] public int Tremor;
+        [DataMember(Name = "saidaMs")] public int SaidaMs;
+        [DataMember(Name = "saidaPx")] public int SaidaPx;
         [DataMember(Name = "autoParar")] public bool AutoParar;
         [DataMember(Name = "limiar")] public int Limiar;
         [DataMember(Name = "checagens")] public int Checagens;
@@ -27,7 +29,7 @@ namespace AutoclickerWardogs
 
         void Padroes()
         {
-            IntervaloMs = 5; Tremor = 1; AutoParar = true; Limiar = 60; Checagens = 6;
+            IntervaloMs = 5; Tremor = 1; SaidaMs = 1000; SaidaPx = 150; AutoParar = true; Limiar = 60; Checagens = 6;
             SempreNoTopo = true; Bipe = true; VerificarAoAbrir = true;
         }
 

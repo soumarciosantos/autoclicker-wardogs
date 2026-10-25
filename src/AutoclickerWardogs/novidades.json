@@ -1,5 +1,13 @@
 [
   {
+    "versao": "3.3.0",
+    "data": "2026-10-25",
+    "itens": [
+      "A cada 1 s o mouse sai do card (desce 150 px), espera um instante e volta, sem clicar enquanto está fora",
+      "Novos ajustes: \"Sair do card e voltar a cada (ms)\" e \"Distância que o mouse desce (px)\""
+    ]
+  },
+  {
     "versao": "3.2.1",
     "data": "2026-10-25",
     "itens": [
