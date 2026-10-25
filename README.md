@@ -38,6 +38,6 @@ dotnet build src/AutoclickerWardogs -c Release -o dist
 
 1. Aumente `<Version>` em `src/AutoclickerWardogs/AutoclickerWardogs.csproj`.
 2. Adicione as mudanças no topo de `src/AutoclickerWardogs/novidades.json`.
-3. Rode `.\publicar.ps1`. Ele compila, gera o instalador (`instalador/AutoclickerWardogs.iss`), gera o `update.json`, cria a release com o instalador e o `.exe` no GitHub e envia tudo.
+3. Rode `.\publicar.ps1`. Ele compila, gera o instalador (`instalador/AutoclickerWardogs.nsi`), gera o `update.json`, cria a release com o instalador e o `.exe` no GitHub e envia tudo.
 
-Para gerar o instalador é preciso o Inno Setup 6: `winget install JRSoftware.InnoSetup`.
+Para gerar o instalador é preciso o NSIS 3: `winget install NSIS.NSIS`.

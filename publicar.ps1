@@ -20,10 +20,10 @@ $exe = Join-Path $dist 'AutoclickerWardogs.exe'
 $hash = (Get-FileHash $exe -Algorithm SHA256).Hash.ToLower()
 
 Write-Host 'Gerando o instalador...'
-$iscc = @("$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe", "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe", "$env:ProgramFiles\Inno Setup 6\ISCC.exe") |
+$makensis = @("${env:ProgramFiles(x86)}\NSIS\makensis.exe", "$env:ProgramFiles\NSIS\makensis.exe") |
     Where-Object { Test-Path $_ } | Select-Object -First 1
-if (-not $iscc) { throw 'Inno Setup não encontrado. Instale com: winget install JRSoftware.InnoSetup' }
-& $iscc /Q "/DAppVersion=$versao" (Join-Path $raiz 'instalador\AutoclickerWardogs.iss')
+if (-not $makensis) { throw 'NSIS não encontrado. Instale com: winget install NSIS.NSIS' }
+& $makensis '/V2' "/DAPPVERSION=$versao" (Join-Path $raiz 'instalador\AutoclickerWardogs.nsi')
 if ($LASTEXITCODE) { throw 'Falha ao gerar o instalador' }
 $setup = Join-Path $dist 'AutoclickerWardogs-Setup.exe'
 

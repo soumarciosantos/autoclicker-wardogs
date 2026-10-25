@@ -1,5 +1,13 @@
 [
   {
+    "versao": "3.1.1",
+    "data": "2026-10-25",
+    "itens": [
+      "Instalador refeito com NSIS (gratuito para qualquer uso): passou de 2 MB para cerca de 120 KB",
+      "Ícone com vários tamanhos, mais nítido na barra de tarefas e nos atalhos"
+    ]
+  },
+  {
     "versao": "3.1.0",
     "data": "2026-10-25",
     "itens": [
