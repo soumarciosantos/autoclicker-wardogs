@@ -4,30 +4,34 @@ Autoclicker com janela para a tela **"Selecione a facção"**: clica sem parar n
 
 ## Como usar
 
-1. Baixe `autoclicker.ps1` e `iniciar-autoclicker.bat` para a mesma pasta.
-2. Dê dois cliques em `iniciar-autoclicker.bat`.
-3. No jogo, deixe o mouse sobre o card do time e aperte **F8**.
+1. Baixe o `AutoclickerWardogs.exe` da [última versão](https://github.com/soumarciosantos/autoclicker-wardogs/releases/latest) e abra. Não precisa instalar nada (usa o .NET Framework 4.8, que já vem no Windows 10 e 11).
+2. No jogo, deixe o mouse sobre o card do time e aperte **F8**.
 
 | Tecla | Ação |
 |---|---|
 | F8 | Liga / pausa (usa a posição atual do mouse) |
 | F9 | Para a sessão |
 
-Dica: use o jogo em modo **janela sem borda**; em tela cheia exclusiva os cliques simulados podem ser ignorados.
+Dicas:
+- Use o jogo em modo **janela sem borda**; em tela cheia exclusiva os cliques simulados podem ser ignorados.
+- Na primeira vez, o Windows pode mostrar "O Windows protegeu o computador" porque o programa não é assinado. Clique em **Mais informações → Executar assim mesmo**.
 
 ## Atualizações
 
-O programa confere `version.json` deste repositório ao abrir. Se houver versão nova, a aba **Atualizações** mostra as novidades e o botão **Instalar atualização** baixa o novo `autoclicker.ps1`, confere o sha256 e reabre.
+Ao abrir, o programa confere o `update.json` deste repositório. Se houver versão nova, a aba **Atualizações** mostra as novidades e o botão **Instalar atualização** baixa o novo `.exe`, confere o sha256, troca o arquivo e reabre.
 
-## Publicar uma nova versão
+Quem ainda usa a versão antiga em PowerShell (2.0.0) recebe automaticamente uma atualização que baixa o `.exe`.
 
-1. Em `autoclicker.ps1`, aumente `$VERSAO` e adicione as mudanças no topo de `$NOVIDADES`.
-2. Gere o `version.json`:
+## Desenvolvimento
 
-   ```
-   powershell -File autoclicker.ps1 -ExportarVersao version.json -UrlScript https://raw.githubusercontent.com/soumarciosantos/autoclicker-wardogs/main/autoclicker.ps1
-   ```
+Código em `src/AutoclickerWardogs` (C#, WinForms, .NET Framework 4.8). Para compilar:
 
-3. Faça commit de `autoclicker.ps1` e `version.json` juntos e envie para `main`.
+```
+dotnet build src/AutoclickerWardogs -c Release -o dist
+```
 
-Não edite `autoclicker.ps1` depois de gerar o `version.json` — o sha256 deixaria de bater e a atualização seria recusada.
+### Publicar uma nova versão
+
+1. Aumente `<Version>` em `src/AutoclickerWardogs/AutoclickerWardogs.csproj`.
+2. Adicione as mudanças no topo de `src/AutoclickerWardogs/novidades.json`.
+3. Rode `.\publicar.ps1`. Ele compila, gera o `update.json`, cria a release com o `.exe` no GitHub e envia tudo.

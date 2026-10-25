@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>AutoclickerWardogs</AssemblyName>
+    <RootNamespace>AutoclickerWardogs</RootNamespace>
+    <Version>3.0.0</Version>
+    <Product>Autoclicker Wardogs</Product>
+    <Description>Autoclicker para a tela de seleção de facção</Description>
+    <ApplicationIcon>icone.ico</ApplicationIcon>
+    <DebugType>none</DebugType>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- campos preenchidos pelo leitor de JSON -->
+    <NoWarn>CS0649</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <EmbeddedResource Include="novidades.json" LogicalName="novidades.json" />
+  </ItemGroup>
+
+</Project>
