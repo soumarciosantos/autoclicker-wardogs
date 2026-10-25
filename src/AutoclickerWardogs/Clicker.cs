@@ -29,15 +29,24 @@ namespace AutoclickerWardogs
         void Loop()
         {
             Native.timeBeginPeriod(1); // Sleep com precisão de 1 ms
+            // Jogos com cursor próprio leem o movimento bruto do mouse (Raw Input) e ignoram SetCursorPos.
+            // Por isso o mouse é movido com deslocamentos relativos, que chegam ao jogo como um mouse físico.
+            int deslocado = 0; // onde o mouse está em relação ao alvo, em px
             try
             {
+                Native.SetCursorPos(x, y);
                 bool direita = false;
                 while (rodando)
                 {
                     // alterna um passo para a esquerda e um para a direita, para o jogo perceber o mouse em cima do card
                     int t = Tremor;
                     direita = !direita;
-                    Native.SetCursorPos(x + (direita ? t : -t), y);
+                    int destino = direita ? t : -t;
+                    if (destino != deslocado)
+                    {
+                        Native.mouse_event(Native.MOUSEEVENTF_MOVE, destino - deslocado, 0, 0, UIntPtr.Zero);
+                        deslocado = destino;
+                    }
                     Native.mouse_event(Native.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, UIntPtr.Zero);
                     Native.mouse_event(Native.MOUSEEVENTF_LEFTUP, 0, 0, 0, UIntPtr.Zero);
                     Interlocked.Increment(ref total);
@@ -46,6 +55,8 @@ namespace AutoclickerWardogs
             }
             finally
             {
+                // devolve o mouse ao ponto de partida
+                if (deslocado != 0) Native.mouse_event(Native.MOUSEEVENTF_MOVE, -deslocado, 0, 0, UIntPtr.Zero);
                 Native.timeEndPeriod(1);
             }
         }
