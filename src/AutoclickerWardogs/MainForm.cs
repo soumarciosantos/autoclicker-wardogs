@@ -35,7 +35,7 @@ namespace AutoclickerWardogs
         Button btnIniciar, btnParar, btnVerificar, btnInstalar;
         ListBox log;
         RichTextBox rtb;
-        NumericUpDown numIntervalo, numLimiar, numChecagens;
+        NumericUpDown numIntervalo, numTremor, numLimiar, numChecagens;
         CheckBox chkAuto, chkTopo, chkBipe, chkVerificar;
 
         public MainForm(bool atualizado)
@@ -182,9 +182,10 @@ namespace AutoclickerWardogs
             try { referencia = ScreenWatcher.Amostra(alvo); } catch { referencia = null; }
             trocada = 0; frac = 0;
             clicker.DelayMs = cfg.IntervaloMs;
+            clicker.Tremor = cfg.Tremor;
             clicker.Iniciar(alvo.X, alvo.Y);
             sessao.Start();
-            lblAlvo.Text = $"Alvo: ({alvo.X}, {alvo.Y})  |  intervalo {cfg.IntervaloMs} ms";
+            lblAlvo.Text = $"Alvo: ({alvo.X}, {alvo.Y})  |  intervalo {cfg.IntervaloMs} ms  |  mexe ±{cfg.Tremor} px";
             btnIniciar.Text = "Pausar (F8)";
             btnIniciar.BackColor = Tema.Amarelo;
             Status("CLICANDO", Tema.Verde, "F8 pausa  |  F9 para");
@@ -272,26 +273,31 @@ namespace AutoclickerWardogs
             pa.Controls.Add(Tema.Rotulo("Intervalo entre cliques (ms)", 0, 4, 300, 22, 10));
             numIntervalo = Tema.Numero(pa, 340, 2, 0, 1000, cfg.IntervaloMs);
             pa.Controls.Add(Tema.Rotulo("1 ms ≈ 1000/s, 5 ms ≈ 200/s, 20 ms ≈ 50/s. Se o jogo não registrar, aumente.", 0, 30, 456, 34, 8, Tema.Sub));
-            chkAuto = Tema.Caixa(pa, "Parar sozinho quando entrar no time", 0, 76, cfg.AutoParar);
-            pa.Controls.Add(Tema.Rotulo("Quanto da tela precisa mudar (%)", 0, 112, 300, 22, 10));
-            numLimiar = Tema.Numero(pa, 340, 110, 20, 95, cfg.Limiar);
-            pa.Controls.Add(Tema.Rotulo("Conferências seguidas antes de parar (1 por s)", 0, 148, 330, 22, 10));
-            numChecagens = Tema.Numero(pa, 340, 146, 1, 30, cfg.Checagens);
-            chkTopo = Tema.Caixa(pa, "Janela sempre por cima do jogo", 0, 190, cfg.SempreNoTopo);
-            chkBipe = Tema.Caixa(pa, "Bipe ao entrar no time", 0, 220, cfg.Bipe);
-            var btnSalvar = Tema.Botao("Salvar ajustes", 0, 266, 456, 40, Tema.Azul);
-            lblSalvo = Tema.Rotulo("", 0, 312, 456, 20, 9, Tema.Verde);
+            pa.Controls.Add(Tema.Rotulo("Mexer o mouse entre cliques (px)", 0, 72, 300, 22, 10));
+            numTremor = Tema.Numero(pa, 340, 70, 0, 10, cfg.Tremor);
+            pa.Controls.Add(Tema.Rotulo("Anda esse tanto para a esquerda e para a direita a cada clique, para o jogo perceber o mouse no card. 0 = parado.", 0, 98, 456, 34, 8, Tema.Sub));
+            chkAuto = Tema.Caixa(pa, "Parar sozinho quando entrar no time", 0, 140, cfg.AutoParar);
+            pa.Controls.Add(Tema.Rotulo("Quanto da tela precisa mudar (%)", 0, 176, 300, 22, 10));
+            numLimiar = Tema.Numero(pa, 340, 174, 20, 95, cfg.Limiar);
+            pa.Controls.Add(Tema.Rotulo("Conferências seguidas antes de parar (1 por s)", 0, 212, 330, 22, 10));
+            numChecagens = Tema.Numero(pa, 340, 210, 1, 30, cfg.Checagens);
+            chkTopo = Tema.Caixa(pa, "Janela sempre por cima do jogo", 0, 254, cfg.SempreNoTopo);
+            chkBipe = Tema.Caixa(pa, "Bipe ao entrar no time", 0, 284, cfg.Bipe);
+            var btnSalvar = Tema.Botao("Salvar ajustes", 0, 330, 456, 40, Tema.Azul);
+            lblSalvo = Tema.Rotulo("", 0, 376, 456, 20, 9, Tema.Verde);
             pa.Controls.AddRange(new Control[] { btnSalvar, lblSalvo });
 
             btnSalvar.Click += (s, e) =>
             {
                 cfg.IntervaloMs = (int)numIntervalo.Value;
+                cfg.Tremor = (int)numTremor.Value;
                 cfg.AutoParar = chkAuto.Checked;
                 cfg.Limiar = (int)numLimiar.Value;
                 cfg.Checagens = (int)numChecagens.Value;
                 cfg.SempreNoTopo = chkTopo.Checked;
                 cfg.Bipe = chkBipe.Checked;
                 clicker.DelayMs = cfg.IntervaloMs;
+                clicker.Tremor = cfg.Tremor;
                 TopMost = cfg.SempreNoTopo;
                 SalvarConfig();
             };

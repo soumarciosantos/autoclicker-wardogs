@@ -7,6 +7,8 @@ namespace AutoclickerWardogs
     class Clicker
     {
         public volatile int DelayMs = 5;
+        // pixels que o mouse anda para cada lado entre os cliques (0 = parado)
+        public volatile int Tremor = 1;
         int x, y;
         long total;
         volatile bool rodando;
@@ -29,9 +31,13 @@ namespace AutoclickerWardogs
             Native.timeBeginPeriod(1); // Sleep com precisão de 1 ms
             try
             {
+                bool direita = false;
                 while (rodando)
                 {
-                    Native.SetCursorPos(x, y);
+                    // alterna um passo para a esquerda e um para a direita, para o jogo perceber o mouse em cima do card
+                    int t = Tremor;
+                    direita = !direita;
+                    Native.SetCursorPos(x + (direita ? t : -t), y);
                     Native.mouse_event(Native.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, UIntPtr.Zero);
                     Native.mouse_event(Native.MOUSEEVENTF_LEFTUP, 0, 0, 0, UIntPtr.Zero);
                     Interlocked.Increment(ref total);

@@ -1,5 +1,13 @@
 [
   {
+    "versao": "3.2.0",
+    "data": "2026-10-25",
+    "itens": [
+      "O mouse anda 1 px para a esquerda e 1 px para a direita a cada clique, para o jogo perceber o mouse em cima do card",
+      "Novo ajuste \"Mexer o mouse entre cliques\" (0 a 10 px; 0 deixa o mouse parado)"
+    ]
+  },
+  {
     "versao": "3.1.1",
     "data": "2026-10-25",
     "itens": [
