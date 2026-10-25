@@ -1,8 +1,15 @@
 {
-  "versao": "3.2.0",
-  "exe": "https://github.com/soumarciosantos/autoclicker-wardogs/releases/download/v3.2.0/AutoclickerWardogs.exe",
-  "sha256": "02f4e33ca0d26fe893a5b8f99b12bab1c393aa5906d20c6b78e12345587a9273",
+  "versao": "3.2.1",
+  "exe": "https://github.com/soumarciosantos/autoclicker-wardogs/releases/download/v3.2.1/AutoclickerWardogs.exe",
+  "sha256": "bb4d2ed5b655c84d81a0656cb4e88cec4da96ad6c540b2cf99915c8d8a519027",
   "novidades": [
+    {
+      "versao": "3.2.1",
+      "data": "2026-10-25",
+      "itens": [
+        "O movimento de ±1 px agora chega ao jogo como se fosse o mouse físico (jogos com cursor próprio ignoravam o movimento anterior)"
+      ]
+    },
     {
       "versao": "3.2.0",
       "data": "2026-10-25",
