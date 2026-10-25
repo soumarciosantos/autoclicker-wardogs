@@ -1,5 +1,14 @@
 [
   {
+    "versao": "3.1.0",
+    "data": "2026-10-25",
+    "itens": [
+      "Instalador: atalho no Menu Iniciar e na área de trabalho",
+      "Aparece em Aplicativos instalados do Windows para desinstalar",
+      "Instala na pasta do usuário, sem pedir administrador"
+    ]
+  },
+  {
     "versao": "3.0.0",
     "data": "2026-10-25",
     "itens": [

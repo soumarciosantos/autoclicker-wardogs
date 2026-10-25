@@ -19,6 +19,14 @@ if ($LASTEXITCODE) { throw 'Falha na compilação' }
 $exe = Join-Path $dist 'AutoclickerWardogs.exe'
 $hash = (Get-FileHash $exe -Algorithm SHA256).Hash.ToLower()
 
+Write-Host 'Gerando o instalador...'
+$iscc = @("$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe", "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe", "$env:ProgramFiles\Inno Setup 6\ISCC.exe") |
+    Where-Object { Test-Path $_ } | Select-Object -First 1
+if (-not $iscc) { throw 'Inno Setup não encontrado. Instale com: winget install JRSoftware.InnoSetup' }
+& $iscc /Q "/DAppVersion=$versao" (Join-Path $raiz 'instalador\AutoclickerWardogs.iss')
+if ($LASTEXITCODE) { throw 'Falha ao gerar o instalador' }
+$setup = Join-Path $dist 'AutoclickerWardogs-Setup.exe'
+
 $info = [ordered]@{
     versao    = $versao
     exe       = "https://github.com/$repo/releases/download/v$versao/AutoclickerWardogs.exe"
@@ -32,8 +40,9 @@ git -C $raiz commit -m "Versão $versao"
 git -C $raiz tag "v$versao"
 # a tag e a release vão primeiro: assim o .exe já existe quando o update.json novo chegar na main
 git -C $raiz push origin "v$versao"
-$notas = ($novidades[0].itens | ForEach-Object { "- $_" }) -join "`n"
-gh release create "v$versao" $exe --repo $repo --title "v$versao" --notes $notas --verify-tag
+$notas = "**Instalar:** baixe o ``AutoclickerWardogs-Setup.exe``. Prefere sem instalar? Use o ``AutoclickerWardogs.exe``.`n`n" +
+    (($novidades[0].itens | ForEach-Object { "- $_" }) -join "`n")
+gh release create "v$versao" $setup $exe --repo $repo --title "v$versao" --notes $notas --verify-tag
 if ($LASTEXITCODE) { throw 'Falha ao criar a release' }
 git -C $raiz push origin main
 

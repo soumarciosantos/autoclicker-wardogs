@@ -4,8 +4,12 @@ Autoclicker com janela para a tela **"Selecione a facção"**: clica sem parar n
 
 ## Como usar
 
-1. Baixe o `AutoclickerWardogs.exe` da [última versão](https://github.com/soumarciosantos/autoclicker-wardogs/releases/latest) e abra. Não precisa instalar nada (usa o .NET Framework 4.8, que já vem no Windows 10 e 11).
+1. Baixe o **`AutoclickerWardogs-Setup.exe`** da [última versão](https://github.com/soumarciosantos/autoclicker-wardogs/releases/latest) e instale. Não pede administrador; cria atalhos no Menu Iniciar e (opcional) na área de trabalho.
+   - Prefere sem instalar? Baixe o `AutoclickerWardogs.exe` da mesma página e abra direto.
+   - Para remover: **Configurações → Aplicativos → Aplicativos instalados → Autoclicker Wardogs → Desinstalar**.
 2. No jogo, deixe o mouse sobre o card do time e aperte **F8**.
+
+Requer Windows 10 ou 11 (usa o .NET Framework 4.8, que já vem no sistema).
 
 | Tecla | Ação |
 |---|---|
@@ -34,4 +38,6 @@ dotnet build src/AutoclickerWardogs -c Release -o dist
 
 1. Aumente `<Version>` em `src/AutoclickerWardogs/AutoclickerWardogs.csproj`.
 2. Adicione as mudanças no topo de `src/AutoclickerWardogs/novidades.json`.
-3. Rode `.\publicar.ps1`. Ele compila, gera o `update.json`, cria a release com o `.exe` no GitHub e envia tudo.
+3. Rode `.\publicar.ps1`. Ele compila, gera o instalador (`instalador/AutoclickerWardogs.iss`), gera o `update.json`, cria a release com o instalador e o `.exe` no GitHub e envia tudo.
+
+Para gerar o instalador é preciso o Inno Setup 6: `winget install JRSoftware.InnoSetup`.
