@@ -1,8 +1,16 @@
 {
-  "versao": "3.1.0",
-  "exe": "https://github.com/soumarciosantos/autoclicker-wardogs/releases/download/v3.1.0/AutoclickerWardogs.exe",
-  "sha256": "3efabd113ed5e16468eaad15209ec2377dfd1db9683d614468eab724493cfba5",
+  "versao": "3.1.1",
+  "exe": "https://github.com/soumarciosantos/autoclicker-wardogs/releases/download/v3.1.1/AutoclickerWardogs.exe",
+  "sha256": "215407bae506a94d1b6002a43a83b3b2ed05f3d7051fc2b12b7afe457444d397",
   "novidades": [
+    {
+      "versao": "3.1.1",
+      "data": "2026-10-25",
+      "itens": [
+        "Instalador refeito com NSIS (gratuito para qualquer uso): passou de 2 MB para cerca de 120 KB",
+        "Ícone com vários tamanhos, mais nítido na barra de tarefas e nos atalhos"
+      ]
+    },
     {
       "versao": "3.1.0",
       "data": "2026-10-25",
