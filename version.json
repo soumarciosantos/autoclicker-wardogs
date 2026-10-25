@@ -1,0 +1,39 @@
+{
+    "versao":  "2.0.0",
+    "script":  "https://raw.githubusercontent.com/soumarciosantos/autoclicker-wardogs/main/autoclicker.ps1",
+    "sha256":  "8a6d4cd2fc57e613d644b54d6cd53602e0b1fabe040aad7f678dd2a58354bd29",
+    "novidades":  [
+                      {
+                          "versao":  "2.0.0",
+                          "data":  "2026-10-25",
+                          "itens":  [
+                                        "Interface em janela com painel, gráfico de cliques/s e log",
+                                        "Aba de ajustes, salvos em config.json",
+                                        "Atualização automática pela internet com conferência sha256",
+                                        "Cliques em thread própria: mais rápidos e estáveis"
+                                    ]
+                      },
+                      {
+                          "versao":  "1.2.0",
+                          "data":  "2026-10-25",
+                          "itens":  [
+                                        "Status ao vivo no terminal"
+                                    ]
+                      },
+                      {
+                          "versao":  "1.1.0",
+                          "data":  "2026-10-24",
+                          "itens":  [
+                                        "Rajadas de cliques sem pausa",
+                                        "Para sozinho ao entrar na facção"
+                                    ]
+                      },
+                      {
+                          "versao":  "1.0.0",
+                          "data":  "2026-10-24",
+                          "itens":  [
+                                        "Primeira versão: F8 liga/pausa, F9 sai"
+                                    ]
+                      }
+                  ]
+}

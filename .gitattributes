@@ -1,0 +1,4 @@
+# Mantém os bytes exatos: o sha256 do version.json depende disso
+*.ps1 -text
+*.bat -text
+version.json -text
