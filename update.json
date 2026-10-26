@@ -1,8 +1,18 @@
 {
-  "versao": "3.3.1",
-  "exe": "https://github.com/soumarciosantos/autoclicker-wardogs/releases/download/v3.3.1/AutoclickerWardogs.exe",
-  "sha256": "238fe030c83ebf819283f789a7e0903863e1587b15d81959740b55372919a21d",
+  "versao": "3.4.0",
+  "exe": "https://github.com/soumarciosantos/autoclicker-wardogs/releases/download/v3.4.0/AutoclickerWardogs.exe",
+  "sha256": "10280d95a0c15494fa41ae44b6b2b0865ffab1518071b639e533d023cb8c2f77",
   "novidades": [
+    {
+      "versao": "3.4.0",
+      "data": "2026-10-26",
+      "itens": [
+        "Visual de guerra: camuflagem, placas de metal com rebites, letras de estêncil e faixa de alerta",
+        "Mascote novo: um cachorro de guerra doido que treme de raiva quando clica, dorme quando pausa e comemora quando você entra no time",
+        "Barra lateral com o mascote, as abas e as teclas F8/F9",
+        "Ícone novo com o cachorro"
+      ]
+    },
     {
       "versao": "3.3.1",
       "data": "2026-10-25",
