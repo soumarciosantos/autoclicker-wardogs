@@ -2,6 +2,8 @@
 
 Autoclicker com janela para a tela **"Selecione a facção"**: clica sem parar no card do time e para sozinho quando a tela some.
 
+![Autoclicker Wardogs: atacando, pausado, ajustes e atualizações](telas/v3.4.0-visual-de-guerra.png)
+
 ## Como usar
 
 1. Baixe o **`AutoclickerWardogs-Setup.exe`** da [última versão](https://github.com/soumarciosantos/autoclicker-wardogs/releases/latest) e instale. Não pede administrador; cria atalhos no Menu Iniciar e (opcional) na área de trabalho.
@@ -41,3 +43,7 @@ dotnet build src/AutoclickerWardogs -c Release -o dist
 3. Rode `.\publicar.ps1`. Ele compila, gera o instalador (`instalador/AutoclickerWardogs.nsi`), gera o `update.json`, cria a release com o instalador e o `.exe` no GitHub e envia tudo.
 
 Para gerar o instalador é preciso o NSIS 3: `winget install NSIS.NSIS`.
+
+### Ícone
+
+O ícone é gerado a partir do desenho do mascote (`Mascote.Desenhar`). Se mudar o mascote, compile, rode `powershell -File ferramentas/gerar-icone.ps1` e compile de novo.

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Timer = System.Windows.Forms.Timer;
@@ -14,13 +16,20 @@ namespace AutoclickerWardogs
         readonly Clicker clicker = new Clicker();
         readonly Stopwatch sessao = new Stopwatch();
         readonly Stopwatch relogioStatus = Stopwatch.StartNew();
-        readonly Dictionary<string, Panel> paginas = new Dictionary<string, Panel>();
-        readonly Dictionary<string, Button> abas = new Dictionary<string, Button>();
+        readonly Dictionary<string, Pagina> paginas = new Dictionary<string, Pagina>();
+        readonly Dictionary<string, BotaoMilitar> abas = new Dictionary<string, BotaoMilitar>();
+        readonly Dictionary<string, string> titulos = new Dictionary<string, string>
+        {
+            ["Painel"] = "// PAINEL DE COMBATE", ["Ajustes"] = "// AJUSTES DA MISSÃO", ["Atualizações"] = "// ATUALIZAÇÕES"
+        };
         readonly Timer tTeclas = new Timer { Interval = 40 };
         readonly Timer tStatus = new Timer { Interval = 250 };
         readonly Timer tSegundo = new Timer { Interval = 1000 };
         readonly Timer tContagem = new Timer { Interval = 1000 };
         readonly bool atualizado;
+
+        const int LarguraLateral = 196;
+        static readonly Color FundoLista = Color.FromArgb(30, 34, 24);
 
         Point alvo;
         Color[] referencia;
@@ -30,13 +39,15 @@ namespace AutoclickerWardogs
         bool prevF8, prevF9, novaSessao = true;
         InfoAtualizacao remoto;
 
-        Label lblStatus, lblDica, lblTotal, cardAgora, cardMedia, cardTempo, cardTela, lblAlvo, lblSalvo, lblAtual;
+        Mascote mascote;
+        Estencil lblTitulo, lblStatus, lblTotal;
+        Label lblDica, cardAgora, cardMedia, cardTempo, cardTela, lblAlvo, lblSalvo, lblAtual;
         Grafico grafico;
-        Button btnIniciar, btnParar, btnVerificar, btnInstalar;
+        BotaoMilitar btnIniciar, btnParar, btnVerificar, btnInstalar;
         ListBox log;
         RichTextBox rtb;
         NumericUpDown numIntervalo, numTremor, numSaidaMs, numSaidaPx, numLimiar, numChecagens;
-        CheckBox chkAuto, chkTopo, chkBipe, chkVerificar;
+        Alternador chkAuto, chkTopo, chkBipe, chkVerificar;
 
         public MainForm(bool atualizado)
         {
@@ -45,29 +56,24 @@ namespace AutoclickerWardogs
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
             Text = $"Autoclicker Wardogs v{Updater.VersaoTexto}";
-            ClientSize = new Size(480, 600);
-            FormBorderStyle = FormBorderStyle.FixedSingle;
-            MaximizeBox = false;
+            ClientSize = new Size(690, 640);
+            FormBorderStyle = FormBorderStyle.None;   // moldura própria, desenhada em OnPaint
             StartPosition = FormStartPosition.CenterScreen;
             BackColor = Tema.Fundo;
             ForeColor = Tema.Texto;
+            DoubleBuffered = true;
             TopMost = cfg.SempreNoTopo;
             try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { }
 
-            // abas feitas com botões (o TabControl padrão não aceita tema escuro)
-            string[] nomes = { "Painel", "Ajustes", "Atualizações" };
-            for (int i = 0; i < nomes.Length; i++)
+            MontarLateral();
+            MontarTopo();
+
+            foreach (var nome in new[] { "Painel", "Ajustes", "Atualizações" })
             {
-                string nome = nomes[i];
-                var b = Tema.Botao(nome, 12 + i * 152, 12, 148, 34, Tema.Painel);
-                b.Click += (s, e) => MostrarPagina(nome);
-                Controls.Add(b);
-                abas[nome] = b;
-                var p = new Panel { Bounds = new Rectangle(12, 56, 456, 532), BackColor = Tema.Fundo, Visible = false };
+                var p = new Pagina { Bounds = new Rectangle(LarguraLateral + 16, 56, 462, 568), Visible = false };
                 Controls.Add(p);
                 paginas[nome] = p;
             }
-
             MontarPainel(paginas["Painel"]);
             MontarAjustes(paginas["Ajustes"]);
             MontarAtualizacoes(paginas["Atualizações"]);
@@ -77,6 +83,122 @@ namespace AutoclickerWardogs
             tSegundo.Tick += (s, e) => CadaSegundo();
             tContagem.Tick += (s, e) => PassoContagem();
             ResumeLayout(false);
+        }
+
+        // ---------- moldura própria ----------
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                const int WS_MINIMIZEBOX = 0x20000, WS_SYSMENU = 0x80000, CS_DROPSHADOW = 0x20000;
+                var cp = base.CreateParams;
+                cp.Style |= WS_MINIMIZEBOX | WS_SYSMENU;   // minimizar e restaurar pela barra de tarefas
+                cp.ClassStyle |= CS_DROPSHADOW;
+                return cp;
+            }
+        }
+
+        // arrastar a janela pelo topo e pela barra lateral (fora dos botões)
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_NCHITTEST = 0x84, HTCLIENT = 1, HTCAPTION = 2;
+            base.WndProc(ref m);
+            if (m.Msg == WM_NCHITTEST && (int)m.Result == HTCLIENT)
+            {
+                long lp = m.LParam.ToInt64();
+                var p = PointToClient(new Point((short)(lp & 0xFFFF), (short)((lp >> 16) & 0xFFFF)));
+                float s = DeviceDpi / 96f;
+                if (p.Y < 52 * s || p.X < LarguraLateral * s) m.Result = (IntPtr)HTCAPTION;
+            }
+        }
+
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+            var g = e.Graphics;
+            float s = DeviceDpi / 96f;
+            using (var camo = new TextureBrush(Tema.Camuflagem))
+                g.FillRectangle(camo, ClientRectangle);
+
+            // barra lateral: metal escuro sobre a camuflagem
+            var lateral = new RectangleF(0, 0, LarguraLateral * s, Height);
+            using (var b = new LinearGradientBrush(lateral, Color.FromArgb(236, 28, 31, 22), Color.FromArgb(244, 18, 20, 14), 0f))
+                g.FillRectangle(b, lateral);
+            using (var p = new Pen(Tema.Borda, 1.5f * s))
+                g.DrawLine(p, lateral.Right, 0, lateral.Right, Height);
+
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
+            Tecla(g, s, 430, "F8", "LIGA / PAUSA");
+            Tecla(g, s, 466, "F9", "PARA");
+            Tema.FaixaAlerta(g, new RectangleF(0, 560 * s, LarguraLateral * s, 12 * s));
+            Tema.FaixaAlerta(g, new RectangleF(lateral.Right, 0, Width - lateral.Right, 4 * s));
+
+            using (var p = new Pen(Tema.Borda))
+                g.DrawRectangle(p, 0, 0, Width - 1, Height - 1);
+        }
+
+        void Tecla(Graphics g, float s, float y, string tecla, string acao)
+        {
+            var r = new RectangleF(22 * s, y * s, 38 * s, 26 * s);
+            using (var forma = Tema.Chanfro(r, 5 * s))
+            using (var b = new LinearGradientBrush(r, Color.FromArgb(70, 76, 54), Color.FromArgb(40, 44, 30), 90f))
+            using (var borda = new Pen(Tema.Destaque, 1.2f * s))
+            {
+                g.FillPath(b, forma);
+                g.DrawPath(borda, forma);
+            }
+            using (var fonte = Tema.Fonte(10, true))
+            using (var fonteAcao = Tema.Fonte(10))
+            using (var cor = new SolidBrush(Tema.Texto))
+            using (var sub = new SolidBrush(Tema.Sub))
+            using (var centro = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
+            using (var esquerda = new StringFormat { LineAlignment = StringAlignment.Center })
+            {
+                g.DrawString(tecla, fonte, cor, r, centro);
+                g.DrawString(acao, fonteAcao, sub, new RectangleF(r.Right + 10 * s, r.Y, 120 * s, r.Height), esquerda);
+            }
+        }
+
+        void MontarLateral()
+        {
+            mascote = new Mascote { Bounds = new Rectangle(23, 14, 150, 150) };
+            var marca = new Estencil
+            {
+                Text = "WARDOGS", Bounds = new Rectangle(0, 164, LarguraLateral, 42), Font = Tema.Fonte(26, true),
+                ForeColor = Tema.Destaque, Alinhamento = StringAlignment.Center
+            };
+            var sub = new Label
+            {
+                Text = "AUTOCLICKER  DE  GUERRA", Bounds = new Rectangle(0, 204, LarguraLateral, 20), Font = Tema.Fonte(9),
+                ForeColor = Tema.Sub, BackColor = Color.Transparent, TextAlign = ContentAlignment.MiddleCenter
+            };
+            Controls.AddRange(new Control[] { mascote, marca, sub });
+
+            string[] nomes = { "Painel", "Ajustes", "Atualizações" };
+            for (int i = 0; i < nomes.Length; i++)
+            {
+                string nome = nomes[i];
+                var b = new BotaoMilitar { Text = nome, Bounds = new Rectangle(16, 242 + i * 50, 164, 42), Estilo = EstiloBotao.Aba };
+                b.Click += (s, e) => MostrarPagina(nome);
+                Controls.Add(b);
+                abas[nome] = b;
+            }
+
+            Controls.Add(new Label
+            {
+                Text = $"v{Updater.VersaoTexto}", Bounds = new Rectangle(0, 590, LarguraLateral, 20), Font = Tema.Fonte(9),
+                ForeColor = Tema.Sub, BackColor = Color.Transparent, TextAlign = ContentAlignment.MiddleCenter
+            });
+        }
+
+        void MontarTopo()
+        {
+            lblTitulo = new Estencil { Bounds = new Rectangle(LarguraLateral + 16, 14, 380, 32), Font = Tema.Fonte(15, true), ForeColor = Tema.Texto };
+            var minimizar = new BotaoMilitar { Text = "_", Bounds = new Rectangle(690 - 86, 14, 34, 28), Estilo = EstiloBotao.Janela, Cor = Tema.Oliva, AccessibleName = "Minimizar" };
+            var fechar = new BotaoMilitar { Text = "X", Bounds = new Rectangle(690 - 46, 14, 34, 28), Estilo = EstiloBotao.Janela, Cor = Tema.Vermelho, AccessibleName = "Fechar" };
+            minimizar.Click += (s, e) => WindowState = FormWindowState.Minimized;
+            fechar.Click += (s, e) => Close();
+            Controls.AddRange(new Control[] { lblTitulo, minimizar, fechar });
         }
 
         protected override void OnShown(EventArgs e)
@@ -101,40 +223,44 @@ namespace AutoclickerWardogs
             foreach (var k in paginas.Keys)
             {
                 paginas[k].Visible = k == nome;
-                abas[k].BackColor = k == nome ? Tema.Azul : Tema.Painel;
+                abas[k].Ativo = k == nome;
             }
+            lblTitulo.Text = titulos[nome];
         }
 
         // ---------- Painel ----------
         void MontarPainel(Panel pp)
         {
-            lblStatus = Tema.Rotulo("PARADO", 0, 0, 456, 34, 18, Tema.Sub, true);
-            lblDica = Tema.Rotulo("Coloque o mouse no card do Wardogs e aperte F8.", 0, 34, 456, 20, 9, Tema.Sub);
-            lblTotal = Tema.Rotulo("0", 0, 58, 456, 62, 36, Tema.Texto, true);
-            pp.Controls.AddRange(new Control[] { lblStatus, lblDica, lblTotal, Tema.Rotulo("cliques nesta sessão", 4, 118, 300, 18, 9, Tema.Sub) });
+            lblStatus = new Estencil { Text = "AGUARDANDO ORDENS", Bounds = new Rectangle(0, 0, 456, 36), Font = Tema.Fonte(21, true), ForeColor = Tema.Sub };
+            lblDica = Tema.Rotulo("Coloque o mouse no card do Wardogs e aperte F8.", 0, 36, 456, 20, 10, Tema.Sub);
+            lblTotal = new Estencil { Text = "0", Bounds = new Rectangle(0, 56, 456, 60), Font = Tema.Fonte(42, true), ForeColor = Tema.Texto };
+            pp.Controls.AddRange(new Control[] { lblStatus, lblDica, lblTotal, Tema.Rotulo("CLIQUES NESTA SESSÃO", 4, 116, 300, 22, 9, Tema.Sub) });
 
-            cardAgora = Tema.Cartao(pp, "AGORA /s", 0, 144);
-            cardMedia = Tema.Cartao(pp, "MÉDIA /s", 116, 144);
+            cardAgora = Tema.Cartao(pp, "AGORA /S", 0, 144);
+            cardMedia = Tema.Cartao(pp, "MÉDIA /S", 116, 144);
             cardTempo = Tema.Cartao(pp, "TEMPO", 232, 144);
             cardTela = Tema.Cartao(pp, "TELA MUDOU", 348, 144);
 
-            lblAlvo = Tema.Rotulo("Alvo: nenhum", 0, 208, 456, 20, 9, Tema.Sub);
+            lblAlvo = Tema.Rotulo("Alvo: nenhum", 0, 208, 456, 20, 9.5f, Tema.Sub);
             grafico = new Grafico { Bounds = new Rectangle(0, 232, 456, 120) };
-            btnIniciar = Tema.Botao("Iniciar (F8)", 0, 362, 222, 42, Tema.Verde);
-            btnParar = Tema.Botao("Parar (F9)", 234, 362, 222, 42, Tema.Vermelho);
+            btnIniciar = Tema.Botao("Iniciar (F8)", 0, 362, 222, 44, Tema.Oliva);
+            btnParar = Tema.Botao("Parar (F9)", 234, 362, 222, 44, Tema.Vermelho);
+
+            var placaLog = new PlacaMetal { Bounds = new Rectangle(0, 416, 456, 148) };
             log = new ListBox
             {
-                Bounds = new Rectangle(0, 414, 456, 118), BackColor = Tema.Painel, ForeColor = Tema.Texto,
-                BorderStyle = BorderStyle.None, Font = new Font("Consolas", 9), HorizontalScrollbar = true
+                Bounds = new Rectangle(10, 10, 436, 128), BackColor = FundoLista, ForeColor = Tema.Texto,
+                BorderStyle = BorderStyle.None, Font = Tema.FonteMono(9)
             };
-            pp.Controls.AddRange(new Control[] { lblAlvo, grafico, btnIniciar, btnParar, log });
+            placaLog.Controls.Add(log);
+            pp.Controls.AddRange(new Control[] { lblAlvo, grafico, btnIniciar, btnParar, placaLog });
 
             // botão Iniciar: contagem de 3 s para dar tempo de levar o mouse até o card
             btnIniciar.Click += (s, e) =>
             {
                 if (clicker.Rodando) { Pausar(); return; }
                 contagem = 3;
-                Status("INICIANDO EM 3...", Tema.Amarelo, "Leve o mouse até o card do time.");
+                Status("INICIANDO EM 3...", Tema.Amarelo, Humor.Parado, "Leve o mouse até o card do time.");
                 tContagem.Start();
             };
             btnParar.Click += (s, e) => Parar();
@@ -146,10 +272,11 @@ namespace AutoclickerWardogs
             while (log.Items.Count > 200) log.Items.RemoveAt(200);
         }
 
-        void Status(string texto, Color cor, string dica = null)
+        void Status(string texto, Color cor, Humor humor, string dica = null)
         {
             lblStatus.Text = texto;
             lblStatus.ForeColor = cor;
+            mascote.Humor = humor;
             if (dica != null) lblDica.Text = dica;
         }
 
@@ -157,7 +284,7 @@ namespace AutoclickerWardogs
         {
             contagem--;
             if (contagem <= 0) { tContagem.Stop(); Iniciar(); }
-            else Status($"INICIANDO EM {contagem}...", Tema.Amarelo, "Leve o mouse até o card do time.");
+            else Status($"INICIANDO EM {contagem}...", Tema.Amarelo, Humor.Parado, "Leve o mouse até o card do time.");
         }
 
         void CancelarContagem()
@@ -170,7 +297,7 @@ namespace AutoclickerWardogs
             Native.GetCursorPos(out var p);
             if (Bounds.Contains(p.X, p.Y))
             {
-                Status("PARADO", Tema.Sub, "O mouse está em cima desta janela. Leve até o card do time e aperte F8.");
+                Status("AGUARDANDO ORDENS", Tema.Sub, Humor.Parado, "O mouse está em cima desta janela. Leve até o card do time e aperte F8.");
                 return;
             }
             if (novaSessao)
@@ -187,8 +314,8 @@ namespace AutoclickerWardogs
             lblAlvo.Text = $"Alvo: ({alvo.X}, {alvo.Y})  |  {cfg.IntervaloMs} ms  |  ±{cfg.Tremor} px" +
                 (cfg.SaidaMs > 0 ? $"  |  sai a cada {cfg.SaidaMs / 1000.0:0.#} s" : "");
             btnIniciar.Text = "Pausar (F8)";
-            btnIniciar.BackColor = Tema.Amarelo;
-            Status("CLICANDO", Tema.Verde, "F8 pausa  |  F9 para");
+            btnIniciar.Cor = Color.FromArgb(150, 112, 24);
+            Status("ATACANDO!", Tema.Destaque, Humor.Clicando, "F8 pausa  |  F9 para");
             Log($"Clicando em ({alvo.X}, {alvo.Y})");
             if (cfg.IntervaloMs < 10)
                 Log($"Aviso: intervalo de {cfg.IntervaloMs} ms é rápido demais para o jogo; use 15 ms em Ajustes");
@@ -206,8 +333,8 @@ namespace AutoclickerWardogs
         {
             clicker.Parar(); sessao.Stop();
             btnIniciar.Text = "Continuar (F8)";
-            btnIniciar.BackColor = Tema.Verde;
-            Status("PAUSADO", Tema.Amarelo, "F8 continua no ponto atual do mouse  |  F9 encerra a sessão");
+            btnIniciar.Cor = Tema.Oliva;
+            Status("PAUSADO", Tema.Amarelo, Humor.Pausado, "F8 continua no ponto atual do mouse  |  F9 encerra a sessão");
             Log($"Pausado - {clicker.Total:N0} cliques");
         }
 
@@ -217,16 +344,16 @@ namespace AutoclickerWardogs
             bool tinhaSessao = clicker.Rodando || sessao.ElapsedTicks > 0;
             clicker.Parar(); sessao.Stop(); novaSessao = true;
             btnIniciar.Text = "Iniciar (F8)";
-            btnIniciar.BackColor = Tema.Verde;
+            btnIniciar.Cor = Tema.Oliva;
             if (entrou)
             {
-                Status("ENTROU NO TIME!", Tema.Azul, "A tela de facção sumiu. Aperte F8 para uma nova sessão.");
+                Status("MISSÃO CUMPRIDA!", Tema.Verde, Humor.Feliz, "A tela de facção sumiu. Aperte F8 para uma nova sessão.");
                 if (cfg.Bipe) Task.Run(() => { Console.Beep(1000, 250); Console.Beep(1400, 250); });
                 Activate();
             }
             else
             {
-                Status("PARADO", Tema.Sub, "Coloque o mouse no card do Wardogs e aperte F8.");
+                Status("AGUARDANDO ORDENS", Tema.Sub, Humor.Parado, "Coloque o mouse no card do Wardogs e aperte F8.");
             }
             if (tinhaSessao) Log($"Sessão encerrada - {clicker.Total:N0} cliques em {sessao.Elapsed:hh\\:mm\\:ss}");
         }
@@ -280,28 +407,28 @@ namespace AutoclickerWardogs
         // ---------- Ajustes ----------
         void MontarAjustes(Panel pa)
         {
-            pa.Controls.Add(Tema.Rotulo("Intervalo entre cliques (ms)", 0, 4, 300, 22, 10));
-            numIntervalo = Tema.Numero(pa, 340, 2, 0, 1000, cfg.IntervaloMs);
-            pa.Controls.Add(Tema.Rotulo("Recomendado: 15 ms (≈ 60/s). O jogo só lê um clique por quadro; abaixo de 10 ms ele começa a perder cliques e movimentos.", 0, 30, 456, 34, 8, Tema.Sub));
-            pa.Controls.Add(Tema.Rotulo("Mexer o mouse entre cliques (px)", 0, 72, 300, 22, 10));
-            numTremor = Tema.Numero(pa, 340, 70, 0, 10, cfg.Tremor);
-            pa.Controls.Add(Tema.Rotulo("Anda esse tanto para a esquerda e para a direita a cada clique, para o jogo perceber o mouse no card. 0 = parado.", 0, 98, 456, 34, 8, Tema.Sub));
-            pa.Controls.Add(Tema.Rotulo("Sair do card e voltar a cada (ms)", 0, 140, 300, 22, 10));
-            numSaidaMs = Tema.Numero(pa, 340, 138, 0, 10000, cfg.SaidaMs);
+            pa.Controls.Add(Tema.Rotulo("Intervalo entre cliques (ms)", 0, 4, 300, 22, 11));
+            numIntervalo = Tema.Numero(pa, 360, 2, 0, 1000, cfg.IntervaloMs);
+            pa.Controls.Add(Tema.Rotulo("Recomendado: 15 ms (≈ 60/s). O jogo só lê um clique por quadro; abaixo de 10 ms ele começa a perder cliques e movimentos.", 0, 30, 456, 34, 9, Tema.Sub));
+            pa.Controls.Add(Tema.Rotulo("Mexer o mouse entre cliques (px)", 0, 72, 300, 22, 11));
+            numTremor = Tema.Numero(pa, 360, 70, 0, 10, cfg.Tremor);
+            pa.Controls.Add(Tema.Rotulo("Anda esse tanto para a esquerda e para a direita a cada clique, para o jogo perceber o mouse no card. 0 = parado.", 0, 98, 456, 34, 9, Tema.Sub));
+            pa.Controls.Add(Tema.Rotulo("Sair do card e voltar a cada (ms)", 0, 140, 300, 22, 11));
+            numSaidaMs = Tema.Numero(pa, 360, 138, 0, 10000, cfg.SaidaMs);
             numSaidaMs.Increment = 100;
-            pa.Controls.Add(Tema.Rotulo("Distância que o mouse anda (px)", 0, 176, 300, 22, 10));
-            numSaidaPx = Tema.Numero(pa, 340, 174, 20, 600, cfg.SaidaPx);
+            pa.Controls.Add(Tema.Rotulo("Distância que o mouse anda (px)", 0, 176, 300, 22, 11));
+            numSaidaPx = Tema.Numero(pa, 360, 174, 20, 600, cfg.SaidaPx);
             numSaidaPx.Increment = 10;
-            pa.Controls.Add(Tema.Rotulo("Sem clicar: sai do card (uma vez descendo, na outra subindo), espera um instante e volta, como se você tirasse o mouse e pusesse de novo. 0 ms = desligado.", 0, 202, 456, 34, 8, Tema.Sub));
+            pa.Controls.Add(Tema.Rotulo("Sem clicar: sai do card (uma vez descendo, na outra subindo), espera um instante e volta, como se você tirasse o mouse e pusesse de novo. 0 ms = desligado.", 0, 202, 456, 34, 9, Tema.Sub));
             chkAuto = Tema.Caixa(pa, "Parar sozinho quando entrar no time", 0, 244, cfg.AutoParar);
-            pa.Controls.Add(Tema.Rotulo("Quanto da tela precisa mudar (%)", 0, 280, 300, 22, 10));
-            numLimiar = Tema.Numero(pa, 340, 278, 20, 95, cfg.Limiar);
-            pa.Controls.Add(Tema.Rotulo("Conferências seguidas antes de parar (1 por s)", 0, 316, 330, 22, 10));
-            numChecagens = Tema.Numero(pa, 340, 314, 1, 30, cfg.Checagens);
+            pa.Controls.Add(Tema.Rotulo("Quanto da tela precisa mudar (%)", 0, 280, 330, 22, 11));
+            numLimiar = Tema.Numero(pa, 360, 278, 20, 95, cfg.Limiar);
+            pa.Controls.Add(Tema.Rotulo("Conferências seguidas antes de parar (1 por s)", 0, 316, 350, 22, 11));
+            numChecagens = Tema.Numero(pa, 360, 314, 1, 30, cfg.Checagens);
             chkTopo = Tema.Caixa(pa, "Janela sempre por cima do jogo", 0, 358, cfg.SempreNoTopo);
-            chkBipe = Tema.Caixa(pa, "Bipe ao entrar no time", 0, 388, cfg.Bipe);
-            var btnSalvar = Tema.Botao("Salvar ajustes", 0, 432, 456, 40, Tema.Azul);
-            lblSalvo = Tema.Rotulo("", 0, 478, 456, 20, 9, Tema.Verde);
+            chkBipe = Tema.Caixa(pa, "Bipe ao entrar no time", 0, 390, cfg.Bipe);
+            var btnSalvar = Tema.Botao("Salvar ajustes", 0, 436, 456, 44, Tema.Oliva);
+            lblSalvo = Tema.Rotulo("", 0, 488, 456, 20, 10, Tema.Verde);
             pa.Controls.AddRange(new Control[] { btnSalvar, lblSalvo });
 
             btnSalvar.Click += (s, e) =>
@@ -315,7 +442,6 @@ namespace AutoclickerWardogs
                 cfg.Checagens = (int)numChecagens.Value;
                 cfg.SempreNoTopo = chkTopo.Checked;
                 cfg.Bipe = chkBipe.Checked;
-                clicker.DelayMs = cfg.IntervaloMs;
                 AplicarAjustesDoClique();
                 TopMost = cfg.SempreNoTopo;
                 SalvarConfig();
@@ -341,24 +467,27 @@ namespace AutoclickerWardogs
         // ---------- Atualizações ----------
         void MontarAtualizacoes(Panel pu)
         {
-            pu.Controls.Add(Tema.Rotulo($"Versão instalada: v{Updater.VersaoTexto}", 0, 0, 456, 26, 12, Tema.Texto, true));
+            pu.Controls.Add(Tema.Rotulo($"Versão instalada: v{Updater.VersaoTexto}", 0, 0, 456, 26, 13, Tema.Texto, true));
             var link = new LinkLabel
             {
-                Text = "Ver o projeto no GitHub", Bounds = new Rectangle(0, 30, 456, 20), Font = Tema.Fonte(9),
-                LinkColor = Tema.Azul, ActiveLinkColor = Tema.Texto, BackColor = Color.Transparent
+                Text = "Ver o projeto no GitHub", Bounds = new Rectangle(0, 30, 456, 20), Font = Tema.Fonte(10),
+                LinkColor = Tema.Destaque, ActiveLinkColor = Tema.Texto, BackColor = Color.Transparent
             };
             link.LinkClicked += (s, e) => Process.Start(Updater.Repositorio);
             chkVerificar = Tema.Caixa(pu, "Verificar atualizações ao abrir", 0, 56, cfg.VerificarAoAbrir);
-            btnVerificar = Tema.Botao("Verificar agora", 0, 92, 222, 40, Tema.Azul);
-            btnInstalar = Tema.Botao("Instalar atualização", 234, 92, 222, 40, Tema.Verde);
+            btnVerificar = Tema.Botao("Verificar agora", 0, 92, 222, 44, Tema.Oliva);
+            btnInstalar = Tema.Botao("Instalar atualização", 234, 92, 222, 44, Color.FromArgb(150, 112, 24));
             btnInstalar.Enabled = false;
-            lblAtual = Tema.Rotulo("Ainda não verificado.", 0, 140, 456, 36, 9, Tema.Sub);
+            lblAtual = Tema.Rotulo("Ainda não verificado.", 0, 142, 456, 36, 10, Tema.Sub);
+
+            var placa = new PlacaMetal { Bounds = new Rectangle(0, 206, 456, 358) };
             rtb = new RichTextBox
             {
-                Bounds = new Rectangle(0, 206, 456, 326), ReadOnly = true, BorderStyle = BorderStyle.None,
-                BackColor = Tema.Painel, ForeColor = Tema.Texto, Font = Tema.Fonte(10)
+                Bounds = new Rectangle(12, 10, 432, 338), ReadOnly = true, BorderStyle = BorderStyle.None,
+                BackColor = FundoLista, ForeColor = Tema.Texto, Font = Tema.Fonte(11)
             };
-            pu.Controls.AddRange(new Control[] { link, btnVerificar, btnInstalar, lblAtual, Tema.Rotulo("Novidades", 0, 180, 456, 22, 11, Tema.Texto, true), rtb });
+            placa.Controls.Add(rtb);
+            pu.Controls.AddRange(new Control[] { link, btnVerificar, btnInstalar, lblAtual, Tema.Rotulo("NOVIDADES", 0, 180, 456, 22, 12, Tema.Destaque, true), placa });
 
             btnVerificar.Click += (s, e) => VerificarAtualizacao(false);
             btnInstalar.Click += (s, e) => InstalarAtualizacao();
@@ -378,12 +507,17 @@ namespace AutoclickerWardogs
             foreach (var n in lista)
             {
                 bool nova = Version.TryParse(n.Versao, out var v) && v > Updater.Versao;
-                rtb.SelectionFont = Tema.Fonte(10, true);
-                rtb.SelectionColor = nova ? Tema.Verde : Tema.Texto;
+                rtb.SelectionIndent = 0;
+                rtb.SelectionHangingIndent = 0;
+                rtb.SelectionFont = Tema.Fonte(11, true);
+                rtb.SelectionColor = nova ? Tema.Verde : Tema.Destaque;
                 rtb.AppendText($"v{n.Versao}   {n.Data}\n");
-                rtb.SelectionFont = Tema.Fonte(10);
-                rtb.SelectionColor = Tema.Sub;
-                foreach (var item in n.Itens ?? new string[0]) rtb.AppendText($"   •  {item}\n");
+                // recuo com deslocamento: as linhas quebradas começam alinhadas com o texto, depois do marcador
+                rtb.SelectionIndent = 8;
+                rtb.SelectionHangingIndent = 15;
+                rtb.SelectionFont = Tema.Fonte(10.5f);
+                rtb.SelectionColor = Tema.Texto;
+                foreach (var item in n.Itens ?? new string[0]) rtb.AppendText($"▸  {item}\n");
                 rtb.AppendText("\n");
             }
             rtb.SelectionStart = 0;
