@@ -304,7 +304,14 @@ namespace AutoclickerWardogs
                     string txtMax = $"MÁX {max:N0}";
                     g.DrawString(txtMax, fonte, pincel, w - g.MeasureString(txtMax, fonte).Width - 8 * s, 4 * s);
 
-                    if (Dados.Count >= 2)
+                    if (Dados.Count < 2)
+                    {
+                        using (var grande = Tema.Fonte(11, true))
+                        using (var meio = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
+                        using (var apagado = new SolidBrush(Color.FromArgb(150, Tema.Sub)))
+                            g.DrawString("SEM DADOS DE COMBATE  ·  APERTE F8", grande, apagado, new RectangleF(0, topo, w, h - topo), meio);
+                    }
+                    else
                     {
                         var pts = new PointF[Dados.Count];
                         for (int k = 0; k < Dados.Count; k++)

@@ -132,20 +132,26 @@ namespace AutoclickerWardogs
                     : new[] { new PointF(37, 73), new PointF(63, 73), new PointF(59, 82), new PointF(41, 82) };
                 using (var escuro = new SolidBrush(Color.FromArgb(46, 14, 16)))
                     g.FillPolygon(escuro, boca);
+                // o contorno vem antes da língua: ela sai por cima do lábio de baixo
+                g.DrawPolygon(contorno, boca);
 
                 // língua para fora, balançando enquanto clica
                 float ang = humor == Humor.Clicando ? (float)Math.Sin(fase * 3) * 18 : feliz ? (float)Math.Sin(fase) * 8 : 0;
                 var estado = g.Save();
-                g.TranslateTransform(45, 80);
+                g.TranslateTransform(45, boca[0].Y + 4);
                 g.RotateTransform(ang);
                 using (var lingua = new SolidBrush(Color.FromArgb(232, 92, 120)))
+                using (var borda = new Pen(Color.FromArgb(150, 40, 62), 1f))
                 using (var meio = new Pen(Color.FromArgb(170, 50, 76), 1.2f))
                 {
-                    g.FillEllipse(lingua, -6, -2, 12, feliz ? 20 : 16);
-                    g.DrawLine(meio, 0, 1, 0, feliz ? 14 : 11);
+                    float comp = feliz ? 20 : 16;
+                    g.FillEllipse(lingua, -6, -2, 12, comp);
+                    g.DrawArc(borda, -6, -2, 12, comp, 10, 160); // só a parte de baixo, a de cima fica dentro da boca
+                    g.DrawLine(meio, 0, 2, 0, comp - 5);
                 }
                 g.Restore(estado);
 
+                // dentes de cima por cima da língua
                 using (var dente = new SolidBrush(Color.FromArgb(246, 242, 228)))
                 {
                     float topo = boca[0].Y;
@@ -158,7 +164,7 @@ namespace AutoclickerWardogs
                     g.FillPolygon(dente, new[] { new PointF(boca[0].X + 1, topo), new PointF(boca[0].X + 5, topo), new PointF(boca[0].X + 3, topo + 7) });
                     g.FillPolygon(dente, new[] { new PointF(boca[1].X - 5, topo), new PointF(boca[1].X - 1, topo), new PointF(boca[1].X - 3, topo + 7) });
                 }
-                g.DrawPolygon(contorno, boca);
+                g.DrawLine(contorno, boca[0], boca[1]); // lábio de cima por cima dos dentes
 
                 DesenharCapacete(g, contorno);
 

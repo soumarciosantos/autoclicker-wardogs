@@ -2,7 +2,9 @@
 
 Autoclicker com janela para a tela **"Selecione a facção"**: clica sem parar no card do time e para sozinho quando a tela some.
 
-![Autoclicker Wardogs: atacando, pausado, ajustes e atualizações](telas/v3.4.0-visual-de-guerra.png)
+![Autoclicker Wardogs: painel com o front de batalha animado](telas/v3.6.0-batalha.png)
+
+![Telas: atacando, pausado, ajustes e atualizações](telas/v3.4.0-visual-de-guerra.png)
 
 ## Como usar
 

@@ -44,6 +44,7 @@ namespace AutoclickerWardogs
         string avisoMostradoPara;
 
         Mascote mascote;
+        Batalha batalha;
         Estencil lblTitulo, lblStatus, lblTotal;
         Label lblDica, cardAgora, cardMedia, cardTempo, cardTela, lblAlvo, lblSalvo, lblAtual;
         Grafico grafico;
@@ -60,7 +61,7 @@ namespace AutoclickerWardogs
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
             Text = $"Autoclicker Wardogs v{Updater.VersaoTexto}";
-            ClientSize = new Size(690, 640);
+            ClientSize = new Size(690, 720);
             FormBorderStyle = FormBorderStyle.None;   // moldura própria, desenhada em OnPaint
             StartPosition = FormStartPosition.CenterScreen;
             BackColor = Tema.Fundo;
@@ -74,7 +75,7 @@ namespace AutoclickerWardogs
 
             foreach (var nome in new[] { "Painel", "Ajustes", "Atualizações" })
             {
-                var p = new Pagina { Bounds = new Rectangle(LarguraLateral + 16, 56, 462, 568), Visible = false };
+                var p = new Pagina { Bounds = new Rectangle(LarguraLateral + 16, 56, 462, 648), Visible = false };
                 Controls.Add(p);
                 paginas[nome] = p;
             }
@@ -133,9 +134,9 @@ namespace AutoclickerWardogs
 
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
-            Tecla(g, s, 430, "F8", "LIGA / PAUSA");
-            Tecla(g, s, 466, "F9", "PARA");
-            Tema.FaixaAlerta(g, new RectangleF(0, 560 * s, LarguraLateral * s, 12 * s));
+            Tecla(g, s, 520, "F8", "LIGA / PAUSA");
+            Tecla(g, s, 556, "F9", "PARA");
+            Tema.FaixaAlerta(g, new RectangleF(0, 640 * s, LarguraLateral * s, 12 * s));
             Tema.FaixaAlerta(g, new RectangleF(lateral.Right, 0, Width - lateral.Right, 4 * s));
 
             using (var p = new Pen(Tema.Borda))
@@ -191,7 +192,7 @@ namespace AutoclickerWardogs
 
             Controls.Add(new Label
             {
-                Text = $"v{Updater.VersaoTexto}", Bounds = new Rectangle(0, 590, LarguraLateral, 20), Font = Tema.Fonte(9),
+                Text = $"v{Updater.VersaoTexto}", Bounds = new Rectangle(0, 670, LarguraLateral, 20), Font = Tema.Fonte(9),
                 ForeColor = Tema.Sub, BackColor = Color.Transparent, TextAlign = ContentAlignment.MiddleCenter
             });
         }
@@ -202,8 +203,8 @@ namespace AutoclickerWardogs
             // aparece quando existe versão nova e a pessoa escolheu "Depois"
             btnNovaVersao = new BotaoMilitar
             {
-                Bounds = new Rectangle(430, 14, 166, 28), Estilo = EstiloBotao.Janela,
-                Cor = Color.FromArgb(150, 112, 24), Font = Tema.Fonte(10, true), Visible = false
+                Bounds = new Rectangle(424, 12, 172, 32), Estilo = EstiloBotao.Janela,
+                Cor = CorAtualizar, Font = Tema.Fonte(11, true), Visible = false
             };
             btnNovaVersao.Click += (s, e) => { MostrarPagina("Atualizações"); InstalarAtualizacao(); };
             Controls.Add(btnNovaVersao);
@@ -244,25 +245,26 @@ namespace AutoclickerWardogs
         // ---------- Painel ----------
         void MontarPainel(Panel pp)
         {
-            lblStatus = new Estencil { Text = "AGUARDANDO ORDENS", Bounds = new Rectangle(0, 0, 456, 36), Font = Tema.Fonte(21, true), ForeColor = Tema.Sub };
-            lblDica = Tema.Rotulo("Coloque o mouse no card do Wardogs e aperte F8.", 0, 36, 456, 20, 10, Tema.Sub);
-            lblTotal = new Estencil { Text = "0", Bounds = new Rectangle(0, 56, 456, 60), Font = Tema.Fonte(42, true), ForeColor = Tema.Texto };
-            pp.Controls.AddRange(new Control[] { lblStatus, lblDica, lblTotal, Tema.Rotulo("CLIQUES NESTA SESSÃO", 4, 116, 300, 22, 9, Tema.Sub) });
+            lblStatus = new Estencil { Text = "AGUARDANDO ORDENS", Bounds = new Rectangle(0, 116, 456, 36), Font = Tema.Fonte(21, true), ForeColor = Tema.Sub };
+            lblDica = Tema.Rotulo("Coloque o mouse no card do Wardogs e aperte F8.", 0, 152, 456, 20, 10, Tema.Sub);
+            lblTotal = new Estencil { Text = "0", Bounds = new Rectangle(0, 172, 456, 60), Font = Tema.Fonte(42, true), ForeColor = Tema.Texto };
+            batalha = new Batalha { Bounds = new Rectangle(0, 0, 456, 110) };
+            pp.Controls.AddRange(new Control[] { batalha, lblStatus, lblDica, lblTotal, Tema.Rotulo("CLIQUES NESTA SESSÃO", 4, 232, 300, 22, 9, Tema.Sub) });
 
-            cardAgora = Tema.Cartao(pp, "AGORA /S", 0, 144);
-            cardMedia = Tema.Cartao(pp, "MÉDIA /S", 116, 144);
-            cardTempo = Tema.Cartao(pp, "TEMPO", 232, 144);
-            cardTela = Tema.Cartao(pp, "TELA MUDOU", 348, 144);
+            cardAgora = Tema.Cartao(pp, "AGORA /S", 0, 260);
+            cardMedia = Tema.Cartao(pp, "MÉDIA /S", 116, 260);
+            cardTempo = Tema.Cartao(pp, "TEMPO", 232, 260);
+            cardTela = Tema.Cartao(pp, "TELA MUDOU", 348, 260);
 
-            lblAlvo = Tema.Rotulo("Alvo: nenhum", 0, 208, 456, 20, 9.5f, Tema.Sub);
-            grafico = new Grafico { Bounds = new Rectangle(0, 232, 456, 120) };
-            btnIniciar = Tema.Botao("Iniciar (F8)", 0, 362, 222, 44, Tema.Oliva);
-            btnParar = Tema.Botao("Parar (F9)", 234, 362, 222, 44, Tema.Vermelho);
+            lblAlvo = Tema.Rotulo("Alvo: nenhum", 0, 324, 456, 20, 9.5f, Tema.Sub);
+            grafico = new Grafico { Bounds = new Rectangle(0, 348, 456, 110) };
+            btnIniciar = Tema.Botao("Iniciar (F8)", 0, 468, 222, 44, Tema.Oliva);
+            btnParar = Tema.Botao("Parar (F9)", 234, 468, 222, 44, Tema.Vermelho);
 
-            var placaLog = new PlacaMetal { Bounds = new Rectangle(0, 416, 456, 148) };
+            var placaLog = new PlacaMetal { Bounds = new Rectangle(0, 522, 456, 122) };
             log = new ListBox
             {
-                Bounds = new Rectangle(10, 10, 436, 128), BackColor = FundoLista, ForeColor = Tema.Texto,
+                Bounds = new Rectangle(10, 10, 436, 102), BackColor = FundoLista, ForeColor = Tema.Texto,
                 BorderStyle = BorderStyle.None, Font = Tema.FonteMono(9)
             };
             placaLog.Controls.Add(log);
@@ -290,6 +292,7 @@ namespace AutoclickerWardogs
             lblStatus.Text = texto;
             lblStatus.ForeColor = cor;
             mascote.Humor = humor;
+            batalha.Humor = humor;
             if (dica != null) lblDica.Text = dica;
         }
 
@@ -400,8 +403,14 @@ namespace AutoclickerWardogs
             cardMedia.Text = (total > 0 ? total / seg : 0).ToString("N0");
             cardTempo.Text = sessao.Elapsed.ToString(@"hh\:mm\:ss");
             cardTela.Text = frac.ToString("P0");
+            // botão de nova versão piscando para chamar atenção
+            if (btnNovaVersao.Visible && btnNovaVersao.Enabled)
+                btnNovaVersao.Cor = (++piscar / 2) % 2 == 0 ? CorAtualizar : Color.FromArgb(214, 160, 40);
             MostrarAvisoSePuder();
         }
+
+        static readonly Color CorAtualizar = Color.FromArgb(150, 112, 24);
+        int piscar;
 
         // abre a janela de nova versão, mas só quando não estiver clicando (para não atrapalhar no jogo)
         void MostrarAvisoSePuder()
@@ -448,47 +457,78 @@ namespace AutoclickerWardogs
         }
 
         // ---------- Ajustes ----------
+        bool montandoAjustes;
+
+        // placa com título em estêncil, agrupando ajustes do mesmo assunto
+        static PlacaMetal Secao(Control pai, string titulo, int y, int altura)
+        {
+            var placa = new PlacaMetal { Bounds = new Rectangle(0, y, 456, altura) };
+            placa.Controls.Add(new Estencil { Text = titulo, Bounds = new Rectangle(14, 6, 300, 24), Font = Tema.Fonte(12, true), ForeColor = Tema.Destaque });
+            pai.Controls.Add(placa);
+            return placa;
+        }
+
+        // linha de ajuste: nome, dica curta embaixo e o número à direita
+        NumericUpDown Linha(Control placa, string nome, string dica, int y, int min, int max, int valor, int passo = 1)
+        {
+            placa.Controls.Add(Tema.Rotulo(nome, 14, y, 320, 22, 11));
+            placa.Controls.Add(Tema.Rotulo(dica, 14, y + 22, 330, 18, 8.5f, Tema.Sub));
+            var n = Tema.Numero(placa, 352, y + 6, min, max, valor);
+            n.Increment = passo;
+            n.ValueChanged += (s, e) => AoMudarAjuste();
+            return n;
+        }
+
+        Alternador Chave(Control placa, string texto, int y, bool marcado)
+        {
+            var c = Tema.Caixa(placa, texto, 14, y, marcado);
+            c.Width = 428;
+            c.CheckedChanged += (s, e) => AoMudarAjuste();
+            return c;
+        }
+
         void MontarAjustes(Panel pa)
         {
-            pa.Controls.Add(Tema.Rotulo("Intervalo entre cliques (ms)", 0, 4, 300, 22, 11));
-            numIntervalo = Tema.Numero(pa, 360, 2, 0, 1000, cfg.IntervaloMs);
-            pa.Controls.Add(Tema.Rotulo("Recomendado: 15 ms (≈ 60/s). O jogo só lê um clique por quadro; abaixo de 10 ms ele começa a perder cliques e movimentos.", 0, 30, 456, 34, 9, Tema.Sub));
-            pa.Controls.Add(Tema.Rotulo("Mexer o mouse entre cliques (px)", 0, 72, 300, 22, 11));
-            numTremor = Tema.Numero(pa, 360, 70, 0, 10, cfg.Tremor);
-            pa.Controls.Add(Tema.Rotulo("Anda esse tanto para a esquerda e para a direita a cada clique, para o jogo perceber o mouse no card. 0 = parado.", 0, 98, 456, 34, 9, Tema.Sub));
-            pa.Controls.Add(Tema.Rotulo("Sair do card e voltar a cada (ms)", 0, 140, 300, 22, 11));
-            numSaidaMs = Tema.Numero(pa, 360, 138, 0, 10000, cfg.SaidaMs);
-            numSaidaMs.Increment = 100;
-            pa.Controls.Add(Tema.Rotulo("Distância que o mouse anda (px)", 0, 176, 300, 22, 11));
-            numSaidaPx = Tema.Numero(pa, 360, 174, 20, 600, cfg.SaidaPx);
-            numSaidaPx.Increment = 10;
-            pa.Controls.Add(Tema.Rotulo("Sem clicar: sai do card (uma vez descendo, na outra subindo), espera um instante e volta, como se você tirasse o mouse e pusesse de novo. 0 ms = desligado.", 0, 202, 456, 34, 9, Tema.Sub));
-            chkAuto = Tema.Caixa(pa, "Parar sozinho quando entrar no time", 0, 244, cfg.AutoParar);
-            pa.Controls.Add(Tema.Rotulo("Quanto da tela precisa mudar (%)", 0, 280, 330, 22, 11));
-            numLimiar = Tema.Numero(pa, 360, 278, 20, 95, cfg.Limiar);
-            pa.Controls.Add(Tema.Rotulo("Conferências seguidas antes de parar (1 por s)", 0, 316, 350, 22, 11));
-            numChecagens = Tema.Numero(pa, 360, 314, 1, 30, cfg.Checagens);
-            chkTopo = Tema.Caixa(pa, "Janela sempre por cima do jogo", 0, 358, cfg.SempreNoTopo);
-            chkBipe = Tema.Caixa(pa, "Bipe ao entrar no time", 0, 390, cfg.Bipe);
-            var btnSalvar = Tema.Botao("Salvar ajustes", 0, 436, 456, 44, Tema.Oliva);
-            lblSalvo = Tema.Rotulo("", 0, 488, 456, 20, 10, Tema.Verde);
-            pa.Controls.AddRange(new Control[] { btnSalvar, lblSalvo });
+            montandoAjustes = true;
 
-            btnSalvar.Click += (s, e) =>
-            {
-                cfg.IntervaloMs = (int)numIntervalo.Value;
-                cfg.Tremor = (int)numTremor.Value;
-                cfg.SaidaMs = (int)numSaidaMs.Value;
-                cfg.SaidaPx = (int)numSaidaPx.Value;
-                cfg.AutoParar = chkAuto.Checked;
-                cfg.Limiar = (int)numLimiar.Value;
-                cfg.Checagens = (int)numChecagens.Value;
-                cfg.SempreNoTopo = chkTopo.Checked;
-                cfg.Bipe = chkBipe.Checked;
-                AplicarAjustesDoClique();
-                TopMost = cfg.SempreNoTopo;
-                SalvarConfig();
-            };
+            var cliques = Secao(pa, "▸ CLIQUES", 0, 132);
+            numIntervalo = Linha(cliques, "Intervalo entre cliques (ms)", "Recomendado 15 ms. Abaixo de 10 o jogo perde cliques.", 34, 0, 1000, cfg.IntervaloMs);
+            numTremor = Linha(cliques, "Mexer o mouse entre cliques (px)", "Anda para os lados a cada clique. 0 = parado.", 82, 0, 10, cfg.Tremor);
+
+            var saida = Secao(pa, "▸ SAIR DO CARD", 140, 132);
+            numSaidaMs = Linha(saida, "Sair e voltar a cada (ms)", "Sai do card sem clicar e volta. 0 = desligado.", 34, 0, 10000, cfg.SaidaMs, 100);
+            numSaidaPx = Linha(saida, "Distância que o mouse anda (px)", "Alterna: uma vez desce, na outra sobe.", 82, 20, 600, cfg.SaidaPx, 10);
+
+            var radar = Secao(pa, "▸ RADAR", 280, 162);
+            chkAuto = Chave(radar, "Parar sozinho quando entrar no time", 34, cfg.AutoParar);
+            numLimiar = Linha(radar, "Quanto da tela precisa mudar (%)", "Mais alto = mais difícil parar sem querer.", 64, 20, 95, cfg.Limiar);
+            numChecagens = Linha(radar, "Conferências seguidas antes de parar", "Uma por segundo.", 112, 1, 30, cfg.Checagens);
+
+            var janela = Secao(pa, "▸ JANELA", 450, 92);
+            chkTopo = Chave(janela, "Janela sempre por cima do jogo", 32, cfg.SempreNoTopo);
+            chkBipe = Chave(janela, "Bipe ao entrar no time", 60, cfg.Bipe);
+
+            lblSalvo = Tema.Rotulo("Os ajustes são salvos sozinhos assim que você muda.", 0, 556, 456, 20, 9.5f, Tema.Sub);
+            pa.Controls.Add(lblSalvo);
+            montandoAjustes = false;
+        }
+
+        // cada mudança vale na hora e é salva, sem botão de salvar
+        void AoMudarAjuste()
+        {
+            if (montandoAjustes) return;
+            cfg.IntervaloMs = (int)numIntervalo.Value;
+            cfg.Tremor = (int)numTremor.Value;
+            cfg.SaidaMs = (int)numSaidaMs.Value;
+            cfg.SaidaPx = (int)numSaidaPx.Value;
+            cfg.AutoParar = chkAuto.Checked;
+            cfg.Limiar = (int)numLimiar.Value;
+            cfg.Checagens = (int)numChecagens.Value;
+            cfg.SempreNoTopo = chkTopo.Checked;
+            cfg.Bipe = chkBipe.Checked;
+            AplicarAjustesDoClique();
+            TopMost = cfg.SempreNoTopo;
+            SalvarConfig();
         }
 
         void SalvarConfig()
@@ -497,8 +537,7 @@ namespace AutoclickerWardogs
             {
                 cfg.Salvar();
                 lblSalvo.ForeColor = Tema.Verde;
-                lblSalvo.Text = "Ajustes salvos.";
-                Log("Ajustes salvos");
+                lblSalvo.Text = $"✔ Salvo às {DateTime.Now:HH:mm:ss}";
             }
             catch (Exception ex)
             {
@@ -523,10 +562,10 @@ namespace AutoclickerWardogs
             btnInstalar.Enabled = false;
             lblAtual = Tema.Rotulo("Ainda não verificado.", 0, 142, 456, 36, 10, Tema.Sub);
 
-            var placa = new PlacaMetal { Bounds = new Rectangle(0, 206, 456, 358) };
+            var placa = new PlacaMetal { Bounds = new Rectangle(0, 206, 456, 438) };
             rtb = new RichTextBox
             {
-                Bounds = new Rectangle(12, 10, 432, 338), ReadOnly = true, BorderStyle = BorderStyle.None,
+                Bounds = new Rectangle(12, 10, 432, 418), ReadOnly = true, BorderStyle = BorderStyle.None,
                 BackColor = FundoLista, ForeColor = Tema.Texto, Font = Tema.Fonte(11)
             };
             placa.Controls.Add(rtb);
@@ -586,7 +625,7 @@ namespace AutoclickerWardogs
                     Aviso($"Nova versão disponível: v{info.Versao}. Clique em Instalar atualização.", Tema.Verde);
                     btnInstalar.Enabled = true;
                     abas["Atualizações"].Text = "Atualizações  ●";
-                    btnNovaVersao.Text = $"Atualizar p/ v{info.Versao}";
+                    btnNovaVersao.Text = $"▲ Atualizar p/ v{info.Versao}";
                     btnNovaVersao.Visible = true;
                     if (avisoMostradoPara != info.Versao)
                     {

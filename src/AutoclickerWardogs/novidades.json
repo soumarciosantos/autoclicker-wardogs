@@ -1,5 +1,16 @@
 [
   {
+    "versao": "3.6.0",
+    "data": "2026-10-27",
+    "itens": [
+      "Front de batalha animado no Painel: morteiros, explosões, helicóptero, caças, holofotes, traçantes e tanque",
+      "A batalha acompanha o programa: calma parado, bombardeio quando ataca, cessar-fogo pausado e sinalizadores na vitória",
+      "Corrigida a língua do cachorro, que aparecia passando por trás da boca",
+      "Ajustes organizados em placas (Cliques, Sair do card, Radar e Janela) e salvos sozinhos, sem botão",
+      "Gráfico mostra um aviso enquanto ainda não há cliques e o botão de atualizar no topo pisca"
+    ]
+  },
+  {
     "versao": "3.5.0",
     "data": "2026-10-27",
     "itens": [
