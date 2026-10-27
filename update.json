@@ -1,8 +1,18 @@
 {
-  "versao": "3.4.0",
-  "exe": "https://github.com/soumarciosantos/autoclicker-wardogs/releases/download/v3.4.0/AutoclickerWardogs.exe",
-  "sha256": "10280d95a0c15494fa41ae44b6b2b0865ffab1518071b639e533d023cb8c2f77",
+  "versao": "3.5.0",
+  "exe": "https://github.com/soumarciosantos/autoclicker-wardogs/releases/download/v3.5.0/AutoclickerWardogs.exe",
+  "sha256": "1991419c44a46db6174726f79fd79701bdb06e2a9a0e70290c007a2d2ce46797",
   "novidades": [
+    {
+      "versao": "3.5.0",
+      "data": "2026-10-27",
+      "itens": [
+        "Aviso de nova versão: abre uma janela com as novidades e os botões Atualizar agora e Depois",
+        "Escolhendo Depois, fica um botão amarelo no topo para atualizar quando quiser",
+        "Confere versões novas ao abrir e a cada 30 minutos com o programa aberto",
+        "O aviso espera você pausar ou parar, para não atrapalhar no jogo"
+      ]
+    },
     {
       "versao": "3.4.0",
       "data": "2026-10-26",
