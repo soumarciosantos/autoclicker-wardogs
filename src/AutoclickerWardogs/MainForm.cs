@@ -26,6 +26,7 @@ namespace AutoclickerWardogs
         readonly Timer tStatus = new Timer { Interval = 250 };
         readonly Timer tSegundo = new Timer { Interval = 1000 };
         readonly Timer tContagem = new Timer { Interval = 1000 };
+        readonly Timer tVerificar = new Timer { Interval = 30 * 60 * 1000 }; // confere atualizações a cada 30 min
         readonly bool atualizado;
 
         const int LarguraLateral = 196;
@@ -38,12 +39,15 @@ namespace AutoclickerWardogs
         long ultimoTotal;
         bool prevF8, prevF9, novaSessao = true;
         InfoAtualizacao remoto;
+        // aviso de nova versão: fica pendente enquanto estiver clicando e aparece uma vez por versão
+        bool avisoPendente, avisoAberto, instalando;
+        string avisoMostradoPara;
 
         Mascote mascote;
         Estencil lblTitulo, lblStatus, lblTotal;
         Label lblDica, cardAgora, cardMedia, cardTempo, cardTela, lblAlvo, lblSalvo, lblAtual;
         Grafico grafico;
-        BotaoMilitar btnIniciar, btnParar, btnVerificar, btnInstalar;
+        BotaoMilitar btnIniciar, btnParar, btnVerificar, btnInstalar, btnNovaVersao;
         ListBox log;
         RichTextBox rtb;
         NumericUpDown numIntervalo, numTremor, numSaidaMs, numSaidaPx, numLimiar, numChecagens;
@@ -82,6 +86,7 @@ namespace AutoclickerWardogs
             tStatus.Tick += (s, e) => AtualizarNumeros();
             tSegundo.Tick += (s, e) => CadaSegundo();
             tContagem.Tick += (s, e) => PassoContagem();
+            tVerificar.Tick += (s, e) => { if (cfg.VerificarAoAbrir && !instalando) VerificarAtualizacao(true); };
             ResumeLayout(false);
         }
 
@@ -193,7 +198,15 @@ namespace AutoclickerWardogs
 
         void MontarTopo()
         {
-            lblTitulo = new Estencil { Bounds = new Rectangle(LarguraLateral + 16, 14, 380, 32), Font = Tema.Fonte(15, true), ForeColor = Tema.Texto };
+            lblTitulo = new Estencil { Bounds = new Rectangle(LarguraLateral + 16, 14, 214, 32), Font = Tema.Fonte(15, true), ForeColor = Tema.Texto };
+            // aparece quando existe versão nova e a pessoa escolheu "Depois"
+            btnNovaVersao = new BotaoMilitar
+            {
+                Bounds = new Rectangle(430, 14, 166, 28), Estilo = EstiloBotao.Janela,
+                Cor = Color.FromArgb(150, 112, 24), Font = Tema.Fonte(10, true), Visible = false
+            };
+            btnNovaVersao.Click += (s, e) => { MostrarPagina("Atualizações"); InstalarAtualizacao(); };
+            Controls.Add(btnNovaVersao);
             var minimizar = new BotaoMilitar { Text = "_", Bounds = new Rectangle(690 - 86, 14, 34, 28), Estilo = EstiloBotao.Janela, Cor = Tema.Oliva, AccessibleName = "Minimizar" };
             var fechar = new BotaoMilitar { Text = "X", Bounds = new Rectangle(690 - 46, 14, 34, 28), Estilo = EstiloBotao.Janela, Cor = Tema.Vermelho, AccessibleName = "Fechar" };
             minimizar.Click += (s, e) => WindowState = FormWindowState.Minimized;
@@ -205,7 +218,7 @@ namespace AutoclickerWardogs
         {
             base.OnShown(e);
             MostrarPagina("Painel");
-            tTeclas.Start(); tStatus.Start(); tSegundo.Start();
+            tTeclas.Start(); tStatus.Start(); tSegundo.Start(); tVerificar.Start();
             Log($"Autoclicker v{Updater.VersaoTexto} aberto");
             if (atualizado) Log($"Atualizado para v{Updater.VersaoTexto}");
             if (cfg.VerificarAoAbrir) VerificarAtualizacao(true);
@@ -214,7 +227,7 @@ namespace AutoclickerWardogs
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             clicker.Parar();
-            tTeclas.Stop(); tStatus.Stop(); tSegundo.Stop(); tContagem.Stop();
+            tTeclas.Stop(); tStatus.Stop(); tSegundo.Stop(); tContagem.Stop(); tVerificar.Stop();
             base.OnFormClosing(e);
         }
 
@@ -387,6 +400,36 @@ namespace AutoclickerWardogs
             cardMedia.Text = (total > 0 ? total / seg : 0).ToString("N0");
             cardTempo.Text = sessao.Elapsed.ToString(@"hh\:mm\:ss");
             cardTela.Text = frac.ToString("P0");
+            MostrarAvisoSePuder();
+        }
+
+        // abre a janela de nova versão, mas só quando não estiver clicando (para não atrapalhar no jogo)
+        void MostrarAvisoSePuder()
+        {
+            if (!avisoPendente || avisoAberto || instalando || remoto == null) return;
+            if (clicker.Rodando || contagem > 0) return;
+            avisoPendente = false;
+            avisoMostradoPara = remoto.Versao;
+            avisoAberto = true;
+            try
+            {
+                using (var aviso = new AvisoAtualizacao(remoto))
+                {
+                    if (aviso.ShowDialog(this) == DialogResult.OK)
+                    {
+                        MostrarPagina("Atualizações");
+                        InstalarAtualizacao();
+                    }
+                    else
+                    {
+                        Log("Atualização adiada - use o botão amarelo no topo quando quiser");
+                    }
+                }
+            }
+            finally
+            {
+                avisoAberto = false;
+            }
         }
 
         // gráfico e detecção de "entrou no time", 1x por segundo
@@ -474,7 +517,7 @@ namespace AutoclickerWardogs
                 LinkColor = Tema.Destaque, ActiveLinkColor = Tema.Texto, BackColor = Color.Transparent
             };
             link.LinkClicked += (s, e) => Process.Start(Updater.Repositorio);
-            chkVerificar = Tema.Caixa(pu, "Verificar atualizações ao abrir", 0, 56, cfg.VerificarAoAbrir);
+            chkVerificar = Tema.Caixa(pu, "Avisar sobre versões novas (ao abrir e a cada 30 min)", 0, 56, cfg.VerificarAoAbrir);
             btnVerificar = Tema.Botao("Verificar agora", 0, 92, 222, 44, Tema.Oliva);
             btnInstalar = Tema.Botao("Instalar atualização", 234, 92, 222, 44, Color.FromArgb(150, 112, 24));
             btnInstalar.Enabled = false;
@@ -543,7 +586,14 @@ namespace AutoclickerWardogs
                     Aviso($"Nova versão disponível: v{info.Versao}. Clique em Instalar atualização.", Tema.Verde);
                     btnInstalar.Enabled = true;
                     abas["Atualizações"].Text = "Atualizações  ●";
-                    Log($"Atualização v{info.Versao} disponível - veja a aba Atualizações");
+                    btnNovaVersao.Text = $"Atualizar p/ v{info.Versao}";
+                    btnNovaVersao.Visible = true;
+                    if (avisoMostradoPara != info.Versao)
+                    {
+                        Log($"Atualização v{info.Versao} disponível");
+                        avisoPendente = true;
+                        MostrarAvisoSePuder();
+                    }
                 }
                 else
                 {
@@ -564,9 +614,10 @@ namespace AutoclickerWardogs
 
         async void InstalarAtualizacao()
         {
-            if (remoto == null) return;
+            if (remoto == null || instalando) return;
+            instalando = true;
             Parar();
-            btnInstalar.Enabled = btnVerificar.Enabled = false;
+            btnInstalar.Enabled = btnVerificar.Enabled = btnNovaVersao.Enabled = false;
             Aviso($"Baixando v{remoto.Versao}...", Tema.Sub);
             try
             {
@@ -577,7 +628,8 @@ namespace AutoclickerWardogs
             catch (Exception ex)
             {
                 Aviso("Atualização cancelada: " + ex.Message, Tema.Vermelho);
-                btnInstalar.Enabled = btnVerificar.Enabled = true;
+                btnInstalar.Enabled = btnVerificar.Enabled = btnNovaVersao.Enabled = true;
+                instalando = false;
             }
         }
     }
