@@ -7,32 +7,28 @@ using System.Windows.Forms;
 
 namespace AutoclickerWardogs
 {
-    // Visual de guerra: verde-oliva, cáqui, camuflagem e placas de metal
+    // Linguagem Wardogs: central tática limpa, sem camuflagem, rebites ou mascote.
+    // Os métodos legados ficam disponíveis para controles antigos
+    // que ainda fazem parte do projeto, mas não são usados nas telas principais.
     static class Tema
     {
-        public static readonly Color Fundo = Color.FromArgb(17, 19, 14);
-        public static readonly Color Lateral = Color.FromArgb(24, 27, 19);
-        public static readonly Color Painel = Color.FromArgb(31, 35, 25);
-        public static readonly Color Borda = Color.FromArgb(74, 80, 56);
-        public static readonly Color Rebite = Color.FromArgb(104, 110, 84);
-        public static readonly Color Grade = Color.FromArgb(48, 54, 38);
-        public static readonly Color Texto = Color.FromArgb(228, 222, 198);
-        public static readonly Color Sub = Color.FromArgb(148, 144, 118);
-        public static readonly Color Destaque = Color.FromArgb(214, 168, 72);   // latão / munição
-        public static readonly Color Oliva = Color.FromArgb(84, 96, 48);
-        public static readonly Color Verde = Color.FromArgb(132, 178, 66);
-        public static readonly Color Amarelo = Color.FromArgb(232, 184, 40);
-        public static readonly Color Vermelho = Color.FromArgb(196, 46, 38);
-        public static readonly Color Azul = Verde;
-
-        // Bahnschrift (Windows 10/11) em negrito condensado lembra letra de estêncil militar
-        static readonly bool TemBahnschrift =
-            new InstalledFontCollection().Families.Any(f => f.Name == "Bahnschrift Condensed");
+        public static readonly Color Fundo = Color.FromArgb(16, 22, 21);
+        public static readonly Color Lateral = Color.FromArgb(22, 30, 27);
+        public static readonly Color Painel = Color.FromArgb(28, 38, 35);
+        public static readonly Color Borda = Color.FromArgb(54, 70, 62);
+        public static readonly Color Rebite = Color.FromArgb(99, 115, 96);
+        public static readonly Color Grade = Color.FromArgb(48, 62, 55);
+        public static readonly Color Texto = Color.FromArgb(243, 244, 232);
+        public static readonly Color Sub = Color.FromArgb(173, 188, 174);
+        public static readonly Color Destaque = Color.FromArgb(239, 185, 78);
+        public static readonly Color Oliva = Color.FromArgb(101, 130, 76);
+        public static readonly Color Verde = Color.FromArgb(117, 210, 159);
+        public static readonly Color Amarelo = Color.FromArgb(239, 185, 78);
+        public static readonly Color Vermelho = Color.FromArgb(222, 105, 90);
+        public static readonly Color Azul = Color.FromArgb(96, 181, 201);
 
         public static Font Fonte(float tamanho, bool negrito = false) =>
-            TemBahnschrift
-                ? new Font(negrito ? "Bahnschrift SemiBold Condensed" : "Bahnschrift SemiCondensed", tamanho, negrito ? FontStyle.Bold : FontStyle.Regular)
-                : new Font("Segoe UI", tamanho, negrito ? FontStyle.Bold : FontStyle.Regular);
+            new Font("Segoe UI", tamanho, negrito ? FontStyle.Bold : FontStyle.Regular);
 
         public static Font FonteMono(float tamanho) => new Font("Consolas", tamanho);
 
@@ -48,6 +44,18 @@ namespace AutoclickerWardogs
                 new PointF(r.Right, r.Bottom - corte), new PointF(r.Right - corte, r.Bottom),
                 new PointF(r.X, r.Bottom), new PointF(r.X, r.Y + corte)
             });
+            return p;
+        }
+
+        public static GraphicsPath Arredondado(RectangleF r, float raio)
+        {
+            var p = new GraphicsPath();
+            float d = Math.Min(Math.Min(r.Width, r.Height), raio * 2);
+            p.AddArc(r.X, r.Y, d, d, 180, 90);
+            p.AddArc(r.Right - d, r.Y, d, d, 270, 90);
+            p.AddArc(r.Right - d, r.Bottom - d, d, d, 0, 90);
+            p.AddArc(r.X, r.Bottom - d, d, d, 90, 90);
+            p.CloseFigure();
             return p;
         }
 
@@ -111,7 +119,8 @@ namespace AutoclickerWardogs
             new Label
             {
                 Text = texto, Bounds = new Rectangle(x, y, w, h), ForeColor = cor ?? Texto,
-                Font = Fonte(tamanho, negrito), BackColor = Color.Transparent
+                Font = Fonte(tamanho, negrito), BackColor = Color.Transparent,
+                AutoEllipsis = true, TextAlign = ContentAlignment.MiddleLeft
             };
 
         public static BotaoMilitar Botao(string texto, int x, int y, int w, int h, Color cor) =>
@@ -120,9 +129,9 @@ namespace AutoclickerWardogs
         // cartão com título pequeno e valor grande; devolve o rótulo do valor
         public static Label Cartao(Control pai, string titulo, int x, int y)
         {
-            var c = new PlacaMetal { Bounds = new Rectangle(x, y, 108, 58) };
-            c.Controls.Add(Rotulo(titulo, 10, 6, 94, 16, 8, Sub));
-            var valor = Rotulo("0", 10, 22, 94, 30, 15, Texto, true);
+            var c = new PlacaMetal { Bounds = new Rectangle(x, y, 174, 82) };
+            c.Controls.Add(Rotulo(titulo, 16, 12, 148, 18, 8.5f, Sub));
+            var valor = Rotulo("0", 16, 33, 148, 38, 20, Texto, true);
             c.Controls.Add(valor);
             pai.Controls.Add(c);
             return valor;
@@ -132,8 +141,8 @@ namespace AutoclickerWardogs
         {
             var n = new NumericUpDown
             {
-                Bounds = new Rectangle(x, y, 90, 26), Minimum = min, Maximum = max,
-                BackColor = Painel, ForeColor = Destaque, BorderStyle = BorderStyle.FixedSingle,
+                Bounds = new Rectangle(x, y, 80, 28), Minimum = min, Maximum = max,
+                BackColor = Painel, ForeColor = Texto, BorderStyle = BorderStyle.FixedSingle,
                 Font = Fonte(11, true), TextAlign = HorizontalAlignment.Center
             };
             n.Value = Math.Max(min, Math.Min(max, valor));
@@ -143,7 +152,7 @@ namespace AutoclickerWardogs
 
         public static Alternador Caixa(Control pai, string texto, int x, int y, bool marcado)
         {
-            var c = new Alternador { Text = texto, Bounds = new Rectangle(x, y, 456, 26), Checked = marcado };
+            var c = new Alternador { Text = texto, Bounds = new Rectangle(x, y, 320, 32), Checked = marcado };
             pai.Controls.Add(c);
             return c;
         }

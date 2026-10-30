@@ -1,8 +1,18 @@
 {
-  "versao": "3.6.0",
-  "exe": "https://github.com/soumarciosantos/autoclicker-wardogs/releases/download/v3.6.0/AutoclickerWardogs.exe",
-  "sha256": "b0ab97721af690d0dd030efb275b0eaf8dd391529ad21526b0aea9320d2119b7",
+  "versao": "3.6.1",
+  "exe": "https://github.com/soumarciosantos/autoclicker-wardogs/releases/download/v3.6.1/AutoclickerWardogs.exe",
+  "sha256": "abed6d20f761104add7688ad84edeab8aed407908d58175ec803fbfab3075ab4",
   "novidades": [
+    {
+      "versao": "3.6.1",
+      "data": "2026-10-30",
+      "itens": [
+        "Interface redesenhada com a marca WARDOGS, navegação limpa e novo indicador animado de sessão",
+        "Painel, ajustes, atualizações e aviso de nova versão atualizados sem alterar o funcionamento do clique",
+        "Aba Sobre com autoria HSP, acesso à comunidade no Discord e apoio via LivePix",
+        "Ícone do aplicativo atualizado para acompanhar a nova interface"
+      ]
+    },
     {
       "versao": "3.6.0",
       "data": "2026-10-27",

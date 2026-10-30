@@ -6,7 +6,7 @@
     <LangVersion>latest</LangVersion>
     <AssemblyName>AutoclickerWardogs</AssemblyName>
     <RootNamespace>AutoclickerWardogs</RootNamespace>
-    <Version>3.6.0</Version>
+    <Version>3.6.1</Version>
     <Product>Autoclicker Wardogs</Product>
     <Description>Autoclicker para a tela de seleção de facção</Description>
     <ApplicationIcon>icone.ico</ApplicationIcon>
@@ -21,6 +21,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <EmbeddedResource Include="novidades.json" LogicalName="novidades.json" />
+    <EmbeddedResource Include="WD_Fullmark_Full.png" LogicalName="WD_Fullmark_Full.png" />
   </ItemGroup>
 
 </Project>
