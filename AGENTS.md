@@ -23,3 +23,11 @@ Estas regras valem para toda demanda, correção, melhoria, documentação, conf
 6. Antes de encerrar qualquer trabalho, verificar que o card do Plane reflete a situação atual. Se não houver acesso ao Plane, informar a pendência e fornecer o conteúdo exato a registrar; não declarar o card atualizado sem confirmação.
 7. Respeitar o fluxo de branches e aprovações específico deste repositório. A atualização do Plane não autoriza merge, deploy ou alteração em produção.
 
+### Decisão sobre skills na etapa Planejado
+
+- Em **Planejado**, responder no card: "Esta demanda precisa criar ou atualizar uma skill para ser executada com qualidade e repetida depois?" Registrar a decisão e o motivo.
+- Se o procedimento for pontual, executar no card da demanda e documentar os passos relevantes nele ou no PR; não criar skill por obrigação.
+- Se a skill for reutilizável em outras demandas, projetos ou agentes, criar **um card separado** para criar/atualizar e testar a skill, vinculado ao card da demanda. Usar o projeto de origem; se a skill for comum a vários projetos, usar o projeto DNSLINK e ligar os cards afetados.
+- O card da skill deve ter objetivo, entradas e saídas, limites, exemplo de uso, critérios de aceite, local de versionamento e teste em um caso real. Não incluir segredos nem dados pessoais.
+- Se a demanda depender da skill, registrar essa dependência e concluir a skill antes da etapa que a exige. Se não depender, os dois cards podem avançar em paralelo.
+- A skill não substitui o card da demanda, os testes, a revisão, a homologação nem as aprovações exigidas para merge e deploy.
