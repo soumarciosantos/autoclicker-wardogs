@@ -1,10 +1,26 @@
-# Autoclicker Wardogs
+# AutoClick WARDOGS
 
 Autoclicker com janela para a tela **"Selecione a facção"**: clica sem parar no card do time e para sozinho quando a tela some.
 
-![Autoclicker Wardogs: painel com o front de batalha animado](telas/v3.6.0-batalha.png)
+Ferramenta independente para WARDOGS, desenvolvida por **HSP**. O jogo é desenvolvido pela BULKHEAD e publicado pela Team17.
 
-![Telas: atacando, pausado, ajustes e atualizações](telas/v3.4.0-visual-de-guerra.png)
+## Interface v3.6.1
+
+**Painel de comando:** estado da sessão, controles, indicador animado, métricas e histórico.
+
+![Painel de comando do AutoClick WARDOGS v3.6.1](telas/v3.6.1-painel.png)
+
+**Ajustes:** ritmo de cliques, movimento do mouse, parada automática e avisos.
+
+![Ajustes do AutoClick WARDOGS v3.6.1](telas/v3.6.1-ajustes.png)
+
+**Atualizações:** versão instalada, verificação e novidades.
+
+![Atualizações do AutoClick WARDOGS v3.6.1](telas/v3.6.1-atualizacoes.png)
+
+**Sobre:** marca do jogo, autoria do AutoClick e acesso à comunidade.
+
+![Sobre o AutoClick WARDOGS v3.6.1](telas/v3.6.1-sobre.png)
 
 ## Como usar
 
@@ -26,7 +42,7 @@ Dicas:
 
 ## Atualizações
 
-Ao abrir, o programa confere o `update.json` deste repositório. Se houver versão nova, a aba **Atualizações** mostra as novidades e o botão **Instalar atualização** baixa o novo `.exe`, confere o sha256, troca o arquivo e reabre.
+Ao abrir, o programa confere o `update.json` deste repositório quando os avisos estão ativados. Se houver versão nova, mostra as novidades; após você escolher **Atualizar agora** ou **Instalar atualização**, baixa o novo `.exe`, confere o SHA-256, troca o arquivo e reabre.
 
 Quem ainda usa a versão antiga em PowerShell (2.0.0) recebe automaticamente uma atualização que baixa o `.exe`.
 
@@ -48,4 +64,4 @@ Para gerar o instalador é preciso o NSIS 3: `winget install NSIS.NSIS`.
 
 ### Ícone
 
-O ícone é gerado a partir do desenho do mascote (`Mascote.Desenhar`). Se mudar o mascote, compile, rode `powershell -File ferramentas/gerar-icone.ps1` e compile de novo.
+O ícone da v3.6.1 está em `src/AutoclickerWardogs/icone.ico`. A marca exibida na interface está em `src/AutoclickerWardogs/WD_Fullmark_Full.png`, proveniente do [press kit da Team17](https://www.team17.com/press-and-creator-hub). O gerador antigo de ícone do mascote não corresponde mais à interface atual.
