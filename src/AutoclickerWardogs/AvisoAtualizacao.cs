@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace AutoclickerWardogs
 {
-    // Janela "Nova versão disponível!" no visual de guerra.
+    // Janela de atualização com a mesma linguagem visual das telas principais.
     // Devolve DialogResult.OK quando a pessoa escolhe atualizar agora.
     class AvisoAtualizacao : Form
     {
@@ -24,31 +24,30 @@ namespace AutoclickerWardogs
             DoubleBuffered = true;
             KeyPreview = true;
 
-            var mascote = new Mascote { Bounds = new Rectangle(18, 22, 110, 110), Humor = Humor.Feliz };
             var titulo = new Estencil
             {
-                Text = "NOVA VERSÃO DISPONÍVEL!", Bounds = new Rectangle(140, 30, 370, 40),
-                Font = Tema.Fonte(20, true), ForeColor = Tema.Destaque
+                Text = "Nova versão disponível", Bounds = new Rectangle(24, 24, 470, 46),
+                Font = Tema.Fonte(20, true), ForeColor = Tema.Texto
             };
-            var versoes = Tema.Rotulo($"Você está na v{Updater.VersaoTexto}  ▸  nova: v{info.Versao}", 142, 72, 360, 24, 12, Tema.Texto, true);
-            var dica = Tema.Rotulo("Leva poucos segundos: o programa baixa, troca o arquivo e abre de novo sozinho.", 142, 98, 360, 40, 9.5f, Tema.Sub);
+            var versoes = Tema.Rotulo($"Instalada: v{Updater.VersaoTexto}   ·   Nova: v{info.Versao}", 24, 78, 470, 28, 11, Tema.Destaque, true);
+            var dica = Tema.Rotulo("O programa baixa a atualização e reabre ao terminar.", 24, 108, 470, 30, 9.5f, Tema.Sub);
 
             var placa = new PlacaMetal { Bounds = new Rectangle(18, 146, 484, 168) };
             var lista = new RichTextBox
             {
                 Bounds = new Rectangle(12, 10, 460, 148), ReadOnly = true, BorderStyle = BorderStyle.None,
-                BackColor = Color.FromArgb(30, 34, 24), ForeColor = Tema.Texto, Font = Tema.Fonte(10.5f),
+                BackColor = Tema.Painel, ForeColor = Tema.Texto, Font = Tema.Fonte(10.5f),
                 ScrollBars = RichTextBoxScrollBars.Vertical, TabStop = false
             };
             placa.Controls.Add(lista);
             PreencherNovidades(lista, info);
 
-            var atualizar = Tema.Botao("Atualizar agora", 18, 330, 300, 50, Color.FromArgb(150, 112, 24));
-            var depois = Tema.Botao("Depois", 330, 330, 172, 50, Tema.Oliva);
+            var atualizar = Tema.Botao("Atualizar agora", 18, 330, 300, 50, Tema.Destaque);
+            var depois = Tema.Botao("Depois", 330, 330, 172, 50, Tema.Lateral);
             atualizar.Click += (s, e) => { DialogResult = DialogResult.OK; Close(); };
             depois.Click += (s, e) => { DialogResult = DialogResult.Cancel; Close(); };
 
-            Controls.AddRange(new Control[] { mascote, titulo, versoes, dica, placa, atualizar, depois });
+            Controls.AddRange(new Control[] { titulo, versoes, dica, placa, atualizar, depois });
             ResumeLayout(false);
             Shown += (s, e) => atualizar.Focus();
         }
@@ -108,11 +107,8 @@ namespace AutoclickerWardogs
         {
             var g = e.Graphics;
             float s = DeviceDpi / 96f;
-            using (var camo = new TextureBrush(Tema.Camuflagem))
-                g.FillRectangle(camo, ClientRectangle);
-            Tema.FaixaAlerta(g, new RectangleF(0, 0, Width, 8 * s));
-            using (var p = new Pen(Tema.Destaque, 2 * s))
-                g.DrawRectangle(p, s, s, Width - 2 * s, Height - 2 * s);
+            g.Clear(Tema.Fundo);
+            using (var p = new Pen(Tema.Borda, s)) g.DrawRectangle(p, 0, 0, Width - 1, Height - 1);
         }
     }
 }
