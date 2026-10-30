@@ -44,3 +44,26 @@ A segurança faz parte do card e não é uma coluna adicional do Kanban:
 - **Melhoria contínua:** após achados recorrentes, avaliar em Planejado se o checklist ou uma skill deve ser atualizado. Quando disponível, usar a skill local `dev-security` para a revisão defensiva; o checklist deste arquivo continua válido mesmo sem essa skill. Não criar skill duplicada sem lacuna demonstrada.
 
 **Foco inicial deste projeto:** Aplicativo Windows: origem/integridade do instalador e atualizador, downloads seguros, permissões mínimas e ausência de segredos embutidos. Ajustar a revisão à arquitetura e às funções efetivamente presentes, sem presumir vulnerabilidades.
+
+### Responsável, executor e revisor no card
+
+Na etapa **Planejado**, preencher no card do Plane, antes de iniciar:
+
+- **Responsável pela entrega:** pessoa que acompanha prioridade, bloqueios, aceite e comunicação. Usar a atribuição do Plane para essa pessoa quando possível.
+- **Executor principal:** Codex, Claude ou pessoa, conforme contexto do repositório, acesso, skill necessária e disponibilidade. Registrar o nome no texto do card; não presumir que o Plane atribui automaticamente tarefas a agentes.
+- **Revisor:** pessoa ou agente que fará revisão técnica independente. Revisão por agente não substitui aprovações humanas exigidas.
+- **Repasse:** se houver mais de um executor, indicar quem conduz e registrar no card o ponto de passagem, artefatos e pendências.
+
+Modelo curto para a descrição do card:
+
+```text
+Responsável pela entrega:
+Executor principal: Codex | Claude | Pessoa
+Revisor:
+Critérios de aceite:
+Branch / PR:
+Testes e segurança:
+Próxima etapa / bloqueios:
+```
+
+O executor atualiza o mesmo card ao mudar de etapa e ao concluir a tarefa, com links e evidências. Se a designação mudar, atualizar o card antes do repasse. Não inventar responsáveis ou executores em cards antigos; marcar como "a definir" até decisão em Planejado. O card e a atribuição não concedem acesso, autorização de merge, homologação ou deploy.
